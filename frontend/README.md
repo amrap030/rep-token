@@ -1,4 +1,4 @@
-# rep-token
+# REP Token
 
 ## Project setup
 ```
