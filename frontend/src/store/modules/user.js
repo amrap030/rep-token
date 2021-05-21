@@ -1,21 +1,21 @@
 export default {
-    state: () => ({
-        name: 'Buster',
-    }),
+  state: () => ({
+    name: "Buster",
+  }),
 
-    getters: {
-        //
-    },
+  getters: {
+    //
+  },
 
-    mutations: {
-        SET_NAME(state, payload) {
-            state.name = payload
-        },
+  mutations: {
+    SET_NAME(state, payload) {
+      state.name = payload;
     },
+  },
 
-    actions: {
-        saveName({ commit }, data) {
-            commit('SET_NAME', data)
-        },
+  actions: {
+    saveName({ commit }, data) {
+      commit("SET_NAME", data);
     },
-}
+  },
+};
