@@ -11,6 +11,9 @@ api_key = os.environ.get('API_KEY')
 gql_url = os.environ.get('GRAPHQL')
 hasura_secret = os.environ.get('HASURA_SECRET')
 
+symbols = ['ADS', 'ALV', 'BASA', 'BAYN', 'BMW', 'CON', '1COV', 'DAI', 'DHER', 'DBK', 'DB1', 'DPW', 'DTEA', 'DWNI', 'EOAA', 'FRE', 'FME', 'HEI', 'HEN', 'IFX', 'LIN', 'MRK', 'MTX', 'MUV2', 'RWE', 'SAP', 'SIE', 'ENR', 'VOW', 'VNA']
+exchanges = ['XETR', 'FSX']
+
 def get_tasks(session):
     tasks = []
     tasks.append(asyncio.create_task(session.get(url.format(host, "AAPL", api_key), ssl=False)))
