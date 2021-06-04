@@ -1,0 +1,4 @@
+aiohttp
+asyncio
+--pre gql[aiohttp]
+gql
