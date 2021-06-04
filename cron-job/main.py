@@ -41,7 +41,7 @@ async def getQuotes():
                     "high": data['high'],
                     "low": data['low'],
                     "open": data['open'],
-                    "close": data['volume'],
+                    "close": data['close'],
                     "volume": data['volume'],
                     "change": data['change'],
                     "change_percent": data['percent_change'],
