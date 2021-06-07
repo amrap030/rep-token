@@ -2,10 +2,11 @@ import asyncio
 import aiohttp
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
-import datetime
+from datetime import datetime
+from pytz import timezone
 import os
 
-url = "{}quote?symbol={}&apikey={}"
+url = "{}quote?symbol={}&interval=5min&apikey={}"
 host = os.environ.get('HOST')
 api_key = os.environ.get('API_KEY')
 gql_url = os.environ.get('GRAPHQL')
@@ -30,7 +31,7 @@ async def getQuotes():
                 query = gql(
                     """
                     mutation insertStockQuotes($symbol: String!, $name: String!, $high: String!, $low: String!, $open: String!, $close: String!, $volume: String!, $change: String!, $change_percent: String!, $time: timestamptz!) {
-                        insert_Stock_Quotes(objects: { symbol: $symbol, name: $name, high: $high, low: $low, open: $open, close: $close, volume: $volume, change: $change, change_percent: $change_percent, time: $time }) {
+                        insert_quotes(objects: { symbol: $symbol, name: $name, high: $high, low: $low, open: $open, close: $close, volume: $volume, change: $change, change_percent: $change_percent, time: $time }) {
                             returning {
                                 id
                             }
@@ -48,7 +49,7 @@ async def getQuotes():
                     "volume": data['volume'],
                     "change": data['change'],
                     "change_percent": data['percent_change'],
-                    "time": datetime.datetime.now().astimezone().isoformat()
+                    "time": datetime.now().astimezone(timezone('Europe/Berlin')).isoformat()
                 }
                 await session.execute(query, variable_values=params)
 
