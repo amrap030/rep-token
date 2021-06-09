@@ -11,12 +11,12 @@ gql_url = os.environ.get('GRAPHQL')
 hasura_secret = os.environ.get('HASURA_SECRET')
 
 async def removeOldestQuotes():
-    today = datetime.now().astimezone(timezone('Europe/Berlin'))
+    today = datetime.now(timezone('CET'))
     delta = ""
     if today.weekday() == 0:
         delta = timedelta(days=4)
     elif today.weekday() == 1:
-        delta = timedelta(days=3)
+        delta = timedelta(days=4)
     else:
         delta = timedelta(days=2)
     date = today - delta
@@ -24,7 +24,7 @@ async def removeOldestQuotes():
     async with Client(transport=transport, fetch_schema_from_transport=True) as session:
         query = gql(
             """
-            mutation deleteStockQuotes($time: timestamptz!) {
+            mutation deleteStockQuotes($time: String!) {
                 delete_quotes(where: {time: { _lt: $time }}) {
                     returning {
                         id
