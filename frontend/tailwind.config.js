@@ -9,7 +9,12 @@ module.exports = {
         // Build your palette here
         fuchsia: colors.fuchsia,
         background: "#121212",
-        gray: colors.blueGray,
+        custom: {
+          secondary: "#1A1B1F",
+          background: "#1F2128",
+          lines: "#1D1E23",
+        },
+        gray: colors.gray,
       },
     },
   },

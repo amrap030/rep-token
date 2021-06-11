@@ -1,6 +1,6 @@
 import Web3 from "web3";
 
-async function init() {
+export async function initWeb3() {
   if (typeof window.ethereum !== undefined) {
     const web3 = new Web3(window.ethereum);
     const accounts = await web3.eth.requestAccounts();
@@ -15,12 +15,10 @@ async function init() {
   } else {
     // DO NOTHING...
   }
-  window.ethereum.on("accountsChanged", function () {
-    init();
-  });
-  window.ethereum.on("chainChanged", function (networkId) {
-    console.log("chainChanged", networkId);
-  });
+  //   window.ethereum.on("accountsChanged", function () {
+  //     initWeb3();
+  //   });
+  //   window.ethereum.on("chainChanged", function (networkId) {
+  //     console.log("chainChanged", networkId);
+  //   });
 }
-
-export { init };

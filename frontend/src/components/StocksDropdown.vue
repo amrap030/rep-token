@@ -7,7 +7,7 @@
   >
     <ListboxButton
       class="flex items-center justify-between w-full px-3 py-4 font-medium text-left  focus:outline-none"
-      ><span class="text-gray-100">{{
+      ><span class="text-gray-100 truncate">{{
         selectedStock.length > 0 ? selectedStock : "Select a stock..."
       }}</span>
 
@@ -27,21 +27,23 @@
       leave-to-class="transform scale-95 opacity-0"
     >
       <ListboxOptions
-        class="absolute w-full overflow-hidden font-medium text-gray-100 bg-gray-800 rounded-lg  focus:outline-none"
+        class="absolute w-full overflow-y-scroll font-medium text-gray-100 bg-gray-800 rounded-lg  focus:outline-none max-h-96"
       >
         <ListboxOption
           as="template"
           v-slot="{ active, selected }"
-          v-for="stock in stocks"
-          :key="stock.id"
-          :value="stock.name"
+          v-for="symbol in symbols"
+          :key="symbol.name"
+          :value="symbol.name + ' - ' + symbol.description"
         >
           <li
             v-wave
             class="flex items-center justify-between px-3 py-4 cursor-pointer"
             :class="{ 'bg-purple-800 text-purple-200': active }"
           >
-            <span>{{ stock.name }}</span>
+            <span class="truncate"
+              >{{ symbol.name }} - {{ symbol.description }}</span
+            >
             <CheckIcon v-show="selected" class="w-5 h-5" />
           </li>
         </ListboxOption>
@@ -51,7 +53,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import {
   Listbox,
   ListboxButton,
@@ -59,8 +61,11 @@ import {
   ListboxOption,
 } from "@headlessui/vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
+import { getSymbols } from "../graphql/queries.js";
+import { useApolloClient } from "../composables/useApolloClient.js";
 
 export default {
+  name: "StocksDropdown",
   components: {
     Listbox,
     ListboxButton,
@@ -69,20 +74,21 @@ export default {
     CheckIcon,
     ChevronDownIcon,
   },
-
   setup() {
-    const stocks = [
-      { id: 1, name: "adidas" },
-      { id: 2, name: "Allianz" },
-      { id: 3, name: "BASF" },
-      { id: 4, name: "Bayer" },
-      { id: 5, name: "BMW" },
-    ];
+    const apollo = useApolloClient();
+    const symbols = ref([]);
     const selectedStock = ref([]);
 
+    onMounted(async () => {
+      const data = await apollo.client.query({
+        query: getSymbols,
+      });
+      symbols.value = data.data.symbols;
+    });
+
     return {
-      stocks,
       selectedStock,
+      symbols,
     };
   },
 };
