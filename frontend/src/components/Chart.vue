@@ -9,9 +9,9 @@
 </template>
 
 <script>
-import { useApolloClient } from "../composables/useApolloClient.js";
+//import { useApolloClient } from "../composables/useApolloClient.js";
 import { filteredQuotes } from "../graphql/subscriptions.js";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, getCurrentInstance } from "vue";
 import { createChart } from "lightweight-charts";
 import { chartConfig, candlestickConfig } from "../config/chart/config.js";
 
@@ -33,11 +33,13 @@ export default {
   props: ["symbol"],
   setup(props) {
     const smbl = ref([]);
-    const apollo = useApolloClient();
+    //const apollo = useApolloClient();
     const chartRef = ref(null);
     const chartContainer = ref(null);
+    const app = getCurrentInstance();
+    const $apollo = app.appContext.config.globalProperties.$apollo;
 
-    const quoteObserver = apollo.client.subscribe({
+    const quoteObserver = $apollo.client.subscribe({
       query: filteredQuotes,
       variables: {
         symbol: props.symbol,
@@ -88,4 +90,9 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.tv-lightweight-charts {
+  margin: auto !important;
+  @apply transform -translate-y-4;
+}
+</style>

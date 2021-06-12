@@ -12,7 +12,7 @@ api_key = os.environ.get('API_KEY')
 gql_url = os.environ.get('GRAPHQL')
 hasura_secret = os.environ.get('HASURA_SECRET')
 
-symbols = ['ADS', 'ALV', 'BASA', 'BAYN', 'BMW', 'CON', '1COV', 'DAI', 'DHER', 'DBK', 'DB1', 'DPW', 'DTEA', 'DWNI', 'EOAA', 'FRE', 'FME', 'HEI', 'HEN', 'IFX', 'LIN', 'MRK', 'MTX', 'MUV2', 'RWE', 'SAP', 'SIE', 'ENR', 'VOW', 'VNA']
+symbols = ['ADS', 'ALV', 'BAS', 'BAYN', 'BMW', 'CON', '1COV', 'DAI', 'DHER', 'DBK', 'DB1', 'DPW', 'DTE', 'DWNI', 'EOAN', 'FRE', 'FME', 'HEI', 'HEN3', 'IFX', 'LIN', 'MRK', 'MTX', 'MUV2', 'RWE', 'SAP', 'SIE', 'ENR', 'VOW3', 'VNA']
 
 def get_tasks(session):
     tasks = []

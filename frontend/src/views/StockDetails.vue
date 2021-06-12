@@ -21,9 +21,4 @@ export default {
 };
 </script>
 
-<style>
-.tv-lightweight-charts {
-  margin: auto !important;
-  @apply transform -translate-y-4;
-}
-</style>
+<style></style>

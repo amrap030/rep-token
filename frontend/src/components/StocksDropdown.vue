@@ -8,11 +8,7 @@
     <ListboxButton
       class="flex items-center justify-between w-full px-3 py-4 font-medium text-left  focus:outline-none"
       ><span class="text-gray-100 truncate"
-        >{{
-          selectedStock.length > 0
-            ? selectedStock
-            : "Select a stock..."
-        }}
+        >{{ selectedStock.length > 0 ? selectedStock : "Select a stock..." }}
         <span v-if="selectedStock.length > 0" class="text-gray-500"
           >({{ getSymbol }})</span
         >
@@ -63,7 +59,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, getCurrentInstance } from "vue";
 import {
   Listbox,
   ListboxButton,
@@ -72,7 +68,6 @@ import {
 } from "@headlessui/vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
 import { getSymbols } from "../graphql/queries.js";
-import { useApolloClient } from "../composables/useApolloClient.js";
 
 export default {
   name: "StocksDropdown",
@@ -85,25 +80,29 @@ export default {
     ChevronDownIcon,
   },
   setup() {
-    const apollo = useApolloClient();
+    //const apollo = useApolloClient();
     const symbols = ref([]);
     const selectedStock = ref([]);
+    const app = getCurrentInstance();
+    const $apollo = app.appContext.config.globalProperties.$apollo;
 
     onMounted(async () => {
-      const data = await apollo.client.query({
+      const data = await $apollo.client.query({
         query: getSymbols,
       });
       symbols.value = data.data.symbols;
     });
 
     const getSymbol = computed(() => {
-      return symbols.value.find(symbol => symbol.description === selectedStock.value).name
+      return symbols.value.find(
+        (symbol) => symbol.description === selectedStock.value
+      ).name;
     });
 
     return {
       selectedStock,
       symbols,
-      getSymbol
+      getSymbol,
     };
   },
 };

@@ -119,8 +119,7 @@
 </template>
 
 <script>
-import { useApolloClient } from "../composables/useApolloClient.js";
-import { ref, computed } from "vue";
+import { ref, computed, getCurrentInstance } from "vue";
 import { ChevronLeftIcon, ArrowDownIcon } from "@heroicons/vue/solid";
 import { allQuotes } from "../graphql/subscriptions.js";
 
@@ -132,9 +131,10 @@ export default {
   setup() {
     const page = ref(1);
     const quotes = ref([]);
-    const apollo = useApolloClient();
+    const app = getCurrentInstance();
+    const $apollo = app.appContext.config.globalProperties.$apollo;
 
-    const observer = apollo.client.subscribe({
+    const observer = $apollo.client.subscribe({
       query: allQuotes,
     });
 
