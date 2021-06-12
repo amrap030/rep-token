@@ -12,7 +12,7 @@ export function useApolloClient() {
   });
 
   const httpLink = new HttpLink({
-    uri: "https://stocks-dapp-db.herokuapp.com/v1/graphql",
+    uri: "http://stocks-dapp-db.herokuapp.com/v1/graphql",
 
     headers: {
       "x-hasura-admin-secret": "blockchain",

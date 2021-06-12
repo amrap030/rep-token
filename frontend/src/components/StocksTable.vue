@@ -1,7 +1,6 @@
 <template>
-  <div class="p-4 text-gray-300 rounded-lg bg-custom-secondary">
-    <div class="grid grid-cols-8 gap-1 pb-4 border-b border-gray-800 max-w-7xl">
-      <div class="font-medium font-">Symbol</div>
+  <div class="p-4 text-gray-300 rounded-2xl bg-custom-secondary">
+    <div class="grid grid-cols-7 gap-1 pb-4 border-b border-gray-800 max-w-7xl">
       <div class="font-medium">Name</div>
       <div class="font-medium text-right">High</div>
       <div class="font-medium text-right">Low</div>
@@ -12,32 +11,80 @@
     </div>
 
     <div v-for="quote in filteredQuotes" :key="quote.symbol">
-      <div
-        v-wave
-        class="grid grid-cols-8 gap-1 py-4 font-light text-gray-300 border-b border-gray-800 cursor-pointer  hover:text-gray-400 max-w-7xl whitespace-nowrap"
+      <router-link
+        :to="{ name: 'StockDetails', params: { symbol: quote.symbol } }"
       >
-        <div>
-          {{ quote.symbol }}
-        </div>
-        <div class="truncate">
-          {{ quote.name }}
-        </div>
-        <div class="text-right">&#8364; {{ quote.high }}</div>
-        <div class="text-right">&#8364; {{ quote.low }}</div>
-        <div class="text-right">&#8364; {{ quote.open }}</div>
-        <div class="text-right">&#8364; {{ quote.close }}</div>
-        <div class="text-right">
-          {{ quote.change }}
-        </div>
         <div
-          class="text-right"
-          :class="
-            quote.change_percent < 0 ? ' text-red-500' : ' text-green-500'
-          "
+          class="relative grid grid-cols-7 gap-1 py-4 text-gray-300 border-b border-gray-800 cursor-pointer  group hover:text-gray-400 max-w-7xl whitespace-nowrap"
         >
-          &#037; {{ quote.change_percent }}
+          <div
+            class="truncate"
+            v-tooltip="{
+              content: quote.name,
+              delay: { show: 0, hide: 0 },
+              placement: 'bottom',
+            }"
+          >
+            {{ quote.name }}
+            <span class="text-gray-500 group-hover:text-gray-700"
+              >({{ quote.symbol }})</span
+            >
+          </div>
+          <div class="text-right">
+            &#8364; {{ Math.round(quote.high * 100) / 100 }}
+          </div>
+          <div class="text-right">
+            &#8364; {{ Math.round(quote.low * 100) / 100 }}
+          </div>
+          <div class="text-right">
+            &#8364; {{ Math.round(quote.open * 100) / 100 }}
+          </div>
+          <div class="text-right">
+            &#8364; {{ Math.round(quote.close * 100) / 100 }}
+          </div>
+          <div
+            class="text-right"
+            :class="
+              Math.round(quote.change * 100) / 100 < 0
+                ? ' text-red-500 group-hover:text-red-700'
+                : ' text-green-500 group-hover:text-green-700'
+            "
+          >
+            <span class="flex items-center justify-end">
+              <ArrowDownIcon
+                v-if="Math.round(quote.change * 100) / 100 !== 0"
+                class="inline-block w-4 h-4"
+                :class="
+                  Math.round(quote.change * 100) / 100 < 0
+                    ? ''
+                    : 'transform rotate-180'
+                "
+              />
+              &nbsp;{{ Math.round(quote.change * 100) / 100 }}
+            </span>
+          </div>
+          <div
+            class="text-right"
+            :class="
+              Math.round(quote.change_percent * 100) / 100 < 0
+                ? ' text-red-500 group-hover:text-red-700'
+                : ' text-green-500 group-hover:text-green-700'
+            "
+          >
+            <span class="flex items-center justify-end"
+              ><ArrowDownIcon
+                v-if="Math.round(quote.change_percent * 100) / 100 !== 0"
+                class="inline-block w-4 h-4"
+                :class="
+                  Math.round(quote.change_percent * 100) / 100 < 0
+                    ? ''
+                    : 'transform rotate-180'
+                "
+              />&nbsp;{{ Math.round(quote.change_percent * 100) / 100 }} &#037;
+            </span>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
     <div
       class="flex items-center justify-center pt-4 space-x-4 text-center  max-w-7xl"
@@ -60,8 +107,8 @@
         :disabled="page === 3 ? true : false"
         @click.prevent="page++"
       >
-        <ChevronRightIcon
-          class="w-5 h-5 cursor-pointer"
+        <ChevronLeftIcon
+          class="w-5 h-5 transform rotate-180 cursor-pointer"
           :class="
             page === 3 ? 'cursor-not-allowed text-gray-700' : 'text-blue-600'
           "
@@ -74,13 +121,13 @@
 <script>
 import { useApolloClient } from "../composables/useApolloClient.js";
 import { ref, computed } from "vue";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/vue/solid";
+import { ChevronLeftIcon, ArrowDownIcon } from "@heroicons/vue/solid";
 import { allQuotes } from "../graphql/subscriptions.js";
 
 export default {
   components: {
     ChevronLeftIcon,
-    ChevronRightIcon,
+    ArrowDownIcon,
   },
   setup() {
     const page = ref(1);

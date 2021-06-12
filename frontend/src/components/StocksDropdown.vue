@@ -7,9 +7,16 @@
   >
     <ListboxButton
       class="flex items-center justify-between w-full px-3 py-4 font-medium text-left  focus:outline-none"
-      ><span class="text-gray-100 truncate">{{
-        selectedStock.length > 0 ? selectedStock : "Select a stock..."
-      }}</span>
+      ><span class="text-gray-100 truncate"
+        >{{
+          selectedStock.length > 0
+            ? selectedStock
+            : "Select a stock..."
+        }}
+        <span v-if="selectedStock.length > 0" class="text-gray-500"
+          >({{ getSymbol }})</span
+        >
+      </span>
 
       <ChevronDownIcon
         class="w-5 h-5 text-gray-100 transition duration-500 ease-in-out transform "
@@ -34,15 +41,18 @@
           v-slot="{ active, selected }"
           v-for="symbol in symbols"
           :key="symbol.name"
-          :value="symbol.name + ' - ' + symbol.description"
+          :value="symbol.description"
         >
           <li
             v-wave
             class="flex items-center justify-between px-3 py-4 cursor-pointer"
-            :class="{ 'bg-purple-800 text-purple-200': active }"
+            :class="{ 'bg-blue-800 text-blue-100': active }"
           >
             <span class="truncate"
-              >{{ symbol.name }} - {{ symbol.description }}</span
+              >{{ symbol.description }}
+              <span :class="active ? 'text-blue-400' : 'text-gray-500'"
+                >({{ symbol.name }})</span
+              ></span
             >
             <CheckIcon v-show="selected" class="w-5 h-5" />
           </li>
@@ -53,7 +63,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import {
   Listbox,
   ListboxButton,
@@ -86,10 +96,23 @@ export default {
       symbols.value = data.data.symbols;
     });
 
+    const getSymbol = computed(() => {
+      return symbols.value.find(symbol => symbol.description === selectedStock.value).name
+    });
+
     return {
       selectedStock,
       symbols,
+      getSymbol
     };
   },
 };
 </script>
+
+<style scoped>
+#s::first-word {
+  float: left;
+  font-size: 300%;
+  margin: 0 10px 10px 0;
+}
+</style>

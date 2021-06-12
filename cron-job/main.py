@@ -6,11 +6,6 @@ from datetime import datetime
 from pytz import timezone
 import os
 
-#host = "https://api.twelvedata.com/"
-#api_key = "d8f072b5b5314d29b71c1ff807cf4109"
-#gql_url = "https://stocks-dapp-db.herokuapp.com/v1/graphql"
-#hasura_secret = "blockchain"
-
 url = "{}quote?symbol={}&interval=5min&exchange=XETR&apikey={}"
 host = os.environ.get('HOST')
 api_key = os.environ.get('API_KEY')

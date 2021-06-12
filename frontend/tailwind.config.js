@@ -6,11 +6,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Build your palette here
-        fuchsia: colors.fuchsia,
         background: "#121212",
         custom: {
-          secondary: "#1A1B1F",
+          secondary: "rgba(25, 27, 31, 0.6)",
           background: "#1F2128",
           lines: "#1D1E23",
         },

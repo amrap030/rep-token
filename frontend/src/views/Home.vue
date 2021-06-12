@@ -1,6 +1,8 @@
 <template>
   <div class="flex flex-col items-center justify-center w-screen space-y-16">
-    <div class="w-full max-w-lg p-4 space-y-4 rounded-lg bg-custom-secondary">
+    <div
+      class="z-50 w-full max-w-lg p-4 space-y-4 rounded-2xl bg-custom-secondary"
+    >
       <StocksDropdown />
       <div class="flex space-x-2">
         <div class="w-full">
@@ -35,10 +37,10 @@
       <div class="flex">
         <button
           v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold text-purple-300 bg-purple-800 rounded-lg  text-md sm:focus:shadow-outline-indigo hover:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-600"
+          class="flex items-center justify-center w-full py-4 font-semibold text-blue-200 bg-blue-800 rounded-lg  text-md sm:focus:shadow-outline-indigo hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700"
           @click.prevent="handler"
         >
-          <CloudIcon class="w-5 h-5 text-purple-300" />
+          <CloudIcon class="w-5 h-5 text-blue-200" />
           <span class="pl-1 text-md">Connect Wallet</span>
         </button>
       </div>
@@ -58,7 +60,6 @@ import {
   CalendarIcon,
 } from "@heroicons/vue/solid";
 import { initWeb3 } from "../composables/useWeb3.js";
-//import { init } from "../web3/index.js";
 
 export default {
   name: "Home",
