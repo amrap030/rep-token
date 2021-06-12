@@ -31,16 +31,16 @@
             >
           </div>
           <div class="text-right">
-            &#8364; {{ Math.round(quote.high * 100) / 100 }}
+            &#8364; {{ Number(quote.high).toFixed(2) }}
           </div>
           <div class="text-right">
-            &#8364; {{ Math.round(quote.low * 100) / 100 }}
+            &#8364; {{ Number(quote.low).toFixed(2) }}
           </div>
           <div class="text-right">
-            &#8364; {{ Math.round(quote.open * 100) / 100 }}
+            &#8364; {{ Number(quote.open).toFixed(2) }}
           </div>
           <div class="text-right">
-            &#8364; {{ Math.round(quote.close * 100) / 100 }}
+            &#8364; {{ Number(quote.close).toFixed(2) }}
           </div>
           <div
             class="text-right"
@@ -60,7 +60,7 @@
                     : 'transform rotate-180'
                 "
               />
-              &nbsp;{{ Math.round(quote.change * 100) / 100 }}
+              &nbsp;{{ Number(quote.change).toFixed(2) }}
             </span>
           </div>
           <div
@@ -80,7 +80,7 @@
                     ? ''
                     : 'transform rotate-180'
                 "
-              />&nbsp;{{ Math.round(quote.change_percent * 100) / 100 }} &#037;
+              />&nbsp;{{ Number(quote.change_percent).toFixed(2) }} &#037;
             </span>
           </div>
         </div>

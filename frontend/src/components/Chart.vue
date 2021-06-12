@@ -4,14 +4,14 @@
     class="relative flex-grow p-4 bg-custom-secondary rounded-xl"
     style="height: 500px"
   >
+    <div class="text-2xl font-medium text-gray-200">&#8364; {{ price }}</div>
+    <div class="ml-0.5 text-xs text-gray-400">{{ time }}</div>
     <div class="absolute bottom-0" ref="chartRef"></div>
   </div>
 </template>
 
 <script>
-//import { useApolloClient } from "../composables/useApolloClient.js";
-import { filteredQuotes } from "../graphql/subscriptions.js";
-import { ref, onMounted, getCurrentInstance } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { createChart } from "lightweight-charts";
 import { chartConfig, candlestickConfig } from "../config/chart/config.js";
 
@@ -29,30 +29,57 @@ function getUnixTimestamp(timestamp) {
   );
 }
 
+function formatTime(timestamp) {
+  const date =
+    typeof timestamp === "string"
+      ? new Date(timestamp)
+      : new Date(timestamp * 1000);
+  const year = date.getFullYear();
+  const hours =
+    typeof timestamp === "string" ? date.getHours() : date.getHours() - 2;
+  const minutes = date.getMinutes();
+  const day = date.getDate();
+  return `${day}. ${date.toLocaleString("default", {
+    month: "long",
+  })} ${year}, ${hours < 10 ? "0" : ""}${hours}:${
+    minutes < 10 ? "0" : ""
+  }${minutes} (CET)`;
+}
+
 export default {
-  props: ["symbol"],
+  props: ["symbol", "quotes"],
   setup(props) {
     const smbl = ref([]);
-    //const apollo = useApolloClient();
     const chartRef = ref(null);
     const chartContainer = ref(null);
-    const app = getCurrentInstance();
-    const $apollo = app.appContext.config.globalProperties.$apollo;
-
-    const quoteObserver = $apollo.client.subscribe({
-      query: filteredQuotes,
-      variables: {
-        symbol: props.symbol,
-      },
-    });
+    const price = ref("");
+    const time = ref("");
 
     onMounted(() => {
       const chart = createChart(chartRef.value, chartConfig);
       const candleSeries = chart.addCandlestickSeries(candlestickConfig);
 
       chart.subscribeCrosshairMove((param) => {
-        console.log(param);
-        if (param.time) console.log(param.seriesPrices.get(candleSeries));
+        if (smbl.value.length) {
+          if (
+            param === undefined ||
+            param.time === undefined ||
+            param.point.x < 0 ||
+            param.point.y < 0
+          ) {
+            price.value = Number(
+              smbl.value[0].quotes[smbl.value[0].quotes.length - 1].close
+            ).toFixed(2);
+            time.value = formatTime(
+              smbl.value[0].quotes[smbl.value[0].quotes.length - 1].time
+            );
+          } else {
+            price.value = Number(
+              param.seriesPrices.get(candleSeries).close
+            ).toFixed(2);
+            time.value = formatTime(param.time);
+          }
+        }
       });
 
       const chartContainerObserver = new ResizeObserver((entries) => {
@@ -64,9 +91,16 @@ export default {
 
       chartContainerObserver.observe(chartContainer.value);
 
-      quoteObserver.subscribe({
-        next(data) {
-          smbl.value = data.data.symbols;
+      watch(
+        () => props.quotes,
+        () => {
+          smbl.value = props.quotes;
+          price.value = Number(
+            smbl.value[0].quotes[smbl.value[0].quotes.length - 1].close
+          ).toFixed(2);
+          time.value = formatTime(
+            smbl.value[0].quotes[smbl.value[0].quotes.length - 1].time
+          );
           const candleData = smbl.value[0].quotes.map((quote) => {
             return {
               time: getUnixTimestamp(new Date(quote.time)),
@@ -78,14 +112,11 @@ export default {
           });
           candleSeries.setData(candleData);
           chart.timeScale().fitContent();
-        },
-        error(error) {
-          console.error(error);
-        },
-      });
+        }
+      );
     });
 
-    return { smbl, chartRef, chartContainer };
+    return { smbl, chartRef, chartContainer, price, time };
   },
 };
 </script>

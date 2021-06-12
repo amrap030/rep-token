@@ -35,6 +35,11 @@ const chartConfig = {
     timeVisible: true,
     secondsVisible: false,
     borderVisible: false,
+    // tickMarkFormatter: (time, tickMarkType, locale) => {
+    //   console.log(time, tickMarkType, locale);
+    //   const year = new Date(time * 1000).getUTCDay();
+    //   return String(year);
+    // },
   },
   localization: {
     locale: "de-DE",

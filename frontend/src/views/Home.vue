@@ -37,7 +37,7 @@
       <div class="flex">
         <button
           v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold text-blue-200 bg-blue-800 rounded-lg  text-md sm:focus:shadow-outline-indigo hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700"
+          class="flex items-center justify-center w-full py-4 font-semibold text-blue-200 bg-blue-800 rounded-lg  text-md hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700"
           @click.prevent="handler"
         >
           <CloudIcon class="w-5 h-5 text-blue-200" />
