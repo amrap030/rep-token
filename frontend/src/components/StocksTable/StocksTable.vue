@@ -121,8 +121,8 @@
 <script>
 import { ref, computed, getCurrentInstance } from "vue";
 import { ChevronLeftIcon, ArrowDownIcon } from "@heroicons/vue/solid";
-import { allQuotes } from "../graphql/subscriptions.js";
-import StocksTableSkeleton from "../components/StocksTableSkeleton.vue";
+import { allQuotes } from "../../graphql/subscriptions.js";
+import StocksTableSkeleton from "./StocksTableSkeleton.vue";
 
 export default {
   components: { ChevronLeftIcon, ArrowDownIcon, StocksTableSkeleton },

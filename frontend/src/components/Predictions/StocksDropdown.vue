@@ -69,7 +69,7 @@ import {
   ListboxOption,
 } from "@headlessui/vue";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/vue/solid";
-import { getSymbols } from "../graphql/queries.js";
+import { getSymbols } from "../../graphql/queries.js";
 
 export default {
   name: "StocksDropdown",

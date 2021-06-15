@@ -104,22 +104,22 @@
         v-if="quotes.length"
         :quotes="quotes[0].quotes[quotes[0].quotes.length - 1]"
       />
-      <Chart :symbol="symbol" :quotes="quotes" />
+      <CandleChart :symbol="symbol" :quotes="quotes" />
     </div>
   </div>
 </template>
 
 <script>
-import Chart from "../components/Chart.vue";
-import Quotes from "../components/Quotes.vue";
-import QuotesSkeleton from "../components/QuotesSkeleton.vue";
+import CandleChart from "../components/Charts/CandleChart.vue";
+import Quotes from "../components/Quotes/Quotes.vue";
+import QuotesSkeleton from "../components/Quotes/QuotesSkeleton.vue";
 import { ref, getCurrentInstance } from "vue";
 import { filteredQuotes } from "../graphql/subscriptions.js";
 import { ArrowDownIcon } from "@heroicons/vue/solid";
 
 export default {
   props: ["symbol"],
-  components: { Chart, Quotes, QuotesSkeleton, ArrowDownIcon },
+  components: { CandleChart, Quotes, QuotesSkeleton, ArrowDownIcon },
   setup(props, { emit }) {
     const app = getCurrentInstance();
     const $apollo = app.appContext.config.globalProperties.$apollo;

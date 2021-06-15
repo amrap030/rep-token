@@ -57,8 +57,8 @@
 <script>
 import { ref } from "vue";
 import { useRoute } from "vue-router";
-import StocksDropdown from "../components/StocksDropdown.vue";
-import StocksTable from "../components/StocksTable.vue";
+import StocksDropdown from "../components/Predictions/StocksDropdown.vue";
+import StocksTable from "../components/StocksTable/StocksTable.vue";
 import {
   CloudIcon,
   CurrencyDollarIcon,

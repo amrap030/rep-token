@@ -18,8 +18,8 @@
 <script>
 import { ref, onMounted, watch } from "vue";
 import { createChart } from "lightweight-charts";
-import { chartConfig, candlestickConfig } from "../config/chart/config.js";
-import Spinner from "../components/Spinner.vue";
+import { chartConfig, candlestickConfig } from "../../config/chart/config.js";
+import Spinner from "../UX/Spinner.vue";
 
 function getUnixTimestamp(timestamp) {
   return (

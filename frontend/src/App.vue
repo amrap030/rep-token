@@ -12,9 +12,9 @@
 
 <script>
 import { ref } from "vue";
-import Banner from "./components/Banner.vue";
-import Navbar from "./components/Navbar.vue";
-import BlockInfo from "./components/BlockInfo.vue";
+import Banner from "./components/UX/Banner.vue";
+import Navbar from "./components/Navigation/Navbar.vue";
+import BlockInfo from "./components/Ethereum/BlockInfo.vue";
 
 export default {
   components: { Banner, Navbar, BlockInfo },
