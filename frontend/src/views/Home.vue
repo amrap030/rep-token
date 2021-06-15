@@ -3,7 +3,7 @@
     <div
       class="z-10 w-full max-w-lg p-4 space-y-4 rounded-2xl bg-custom-secondary"
     >
-      <StocksDropdown />
+      <StocksDropdown :selected="selected" />
       <div class="flex space-x-2">
         <div class="w-full">
           <label class="sr-only">Price</label>
@@ -42,7 +42,7 @@
       <div class="flex">
         <button
           v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-700"
+          class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
           @click.prevent="handler"
         >
           <CloudIcon class="w-5 h-5 text-blue-100" />
@@ -55,8 +55,8 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
-import { useStore } from "vuex";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
 import StocksDropdown from "../components/StocksDropdown.vue";
 import StocksTable from "../components/StocksTable.vue";
 import {
@@ -75,20 +75,22 @@ export default {
     CurrencyDollarIcon,
     CalendarIcon,
   },
-  setup() {
-    const price = ref("");
-    const date = ref("");
+  props: ["selected"],
+  setup(props) {
+    const price = ref(props.selected ? props.selected.price : "");
+    const date = ref(
+      props.selected
+        ? new Date().toISOString().substring(0, 11) +
+            new Date().toLocaleTimeString().substring(0, 5)
+        : ""
+    );
+    const route = useRoute();
 
     const handler = () => {
       initWeb3();
     };
 
-    const store = useStore();
-    const name = computed(() => {
-      return store.state.user.name;
-    });
-
-    return { name, price, date, handler };
+    return { price, date, route, handler };
   },
 };
 </script>

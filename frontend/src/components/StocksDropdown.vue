@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import { ref, computed, getCurrentInstance } from "vue";
+import { ref, computed, getCurrentInstance, watchEffect } from "vue";
 import {
   Listbox,
   ListboxButton,
@@ -81,7 +81,8 @@ export default {
     CheckIcon,
     ChevronDownIcon,
   },
-  setup() {
+  props: ["selected"],
+  setup(props) {
     const symbols = ref([]);
     const selectedStock = ref([]);
     const app = getCurrentInstance();
@@ -97,6 +98,16 @@ export default {
       return symbols.value.find(
         (symbol) => symbol.description === selectedStock.value
       ).name;
+    });
+
+    watchEffect(() => {
+      if (symbols.value.length) {
+        if (props.selected) {
+          selectedStock.value = symbols.value.find(
+            (symbol) => symbol.name === props.selected.symbol
+          ).description;
+        }
+      }
     });
 
     return {

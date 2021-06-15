@@ -2,10 +2,13 @@
   <div class="flex flex-col p-4 mx-auto max-w-7xl md:p-0">
     <div class="z-10 font-medium text-gray-300 mt-6text-base">
       <span class="text-gray-400"
-        ><router-link :to="{ name: 'Home' }" class="hover:text-gray-300"
+        ><router-link
+          :to="{ name: 'Home' }"
+          class="hover:text-gray-300"
+          @click.prevent="emit('stockSelected', '')"
           >Home</router-link
         >
-        > Stocks ></span
+        > Symbols ></span
       >
       {{ symbol }}
     </div>
@@ -76,12 +79,21 @@
         </div>
       </div>
       <div class="flex items-end">
-        <button
+        <router-link
+          :to="{ name: 'Home' }"
           v-wave
           class="z-10 px-6 py-2 text-blue-100 bg-blue-600 rounded-lg  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          @click.prevent="
+            emit('stockSelected', {
+              symbol,
+              price: Number(
+                quotes[0].quotes[quotes[0].quotes.length - 1].close
+              ).toFixed(2),
+            })
+          "
         >
           Predict
-        </button>
+        </router-link>
       </div>
     </div>
     <div
@@ -108,7 +120,7 @@ import { ArrowDownIcon } from "@heroicons/vue/solid";
 export default {
   props: ["symbol"],
   components: { Chart, Quotes, QuotesSkeleton, ArrowDownIcon },
-  setup(props) {
+  setup(props, { emit }) {
     const app = getCurrentInstance();
     const $apollo = app.appContext.config.globalProperties.$apollo;
     const quotes = ref([]);
@@ -128,7 +140,7 @@ export default {
         console.error(error);
       },
     });
-    return { quotes };
+    return { quotes, emit };
   },
 };
 </script>

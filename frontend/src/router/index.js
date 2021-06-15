@@ -5,11 +5,19 @@ import StockDetails from "/src/views/StockDetails.vue";
 const routes = [
   {
     path: "/",
+    redirect: "/predict",
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: "/predict",
+  },
+  {
+    path: "/predict",
     name: "Home",
     component: Home,
   },
   {
-    path: "/stocks/:symbol",
+    path: "/symbols/:symbol",
     name: "StockDetails",
     component: StockDetails,
     props: true,
