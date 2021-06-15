@@ -1,5 +1,7 @@
 <template>
-  <div class="flex flex-col w-64 p-4 space-y-4 bg-custom-secondary rounded-xl">
+  <div
+    class="flex flex-col w-full p-4 space-y-4  md:w-64 bg-custom-secondary rounded-xl"
+  >
     <div class="spaxe-y-0.5">
       <div class="text-gray-500">Open</div>
       <div class="text-2xl font-medium text-gray-200">

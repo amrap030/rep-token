@@ -12,7 +12,7 @@ export function useApolloClient() {
   });
 
   const httpLink = new HttpLink({
-    uri: "http://stocks-dapp-db.herokuapp.com/v1/graphql",
+    uri: "https://stocks-dapp-db.herokuapp.com/v1/graphql",
     cache: new InMemoryCache(),
     headers: {
       "x-hasura-admin-secret": "blockchain",
@@ -20,7 +20,7 @@ export function useApolloClient() {
   });
 
   const wsLink = new WebSocketLink({
-    uri: "ws://stocks-dapp-db.herokuapp.com/v1/graphql",
+    uri: "wss://stocks-dapp-db.herokuapp.com/v1/graphql",
     options: {
       reconnect: true,
       connectionParams: {

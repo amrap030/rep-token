@@ -1,7 +1,7 @@
 <template>
   <Listbox
     as="div"
-    class="relative w-full space-y-1 bg-gray-800 rounded-lg"
+    class="relative z-50 w-full space-y-1 rounded-lg bg-custom-tertiary"
     v-model="selectedStock"
     v-slot="{ open }"
   >
@@ -30,7 +30,7 @@
       leave-to-class="transform scale-95 opacity-0"
     >
       <ListboxOptions
-        class="absolute w-full overflow-y-scroll font-medium text-gray-100 bg-gray-800 rounded-lg  focus:outline-none max-h-96"
+        class="absolute w-full overflow-y-scroll font-medium text-gray-100 rounded-lg  bg-custom-tertiary focus:outline-none max-h-96"
       >
         <ListboxOption
           as="template"
@@ -41,15 +41,17 @@
         >
           <li
             v-wave
-            class="flex items-center justify-between px-3 py-4 cursor-pointer"
-            :class="{ 'bg-blue-800 text-blue-100': active }"
+            :class="[
+              active ? 'bg-blue-800 text-blue-100' : '',
+              'flex items-center justify-between px-3 py-4 cursor-pointer',
+            ]"
           >
             <span class="truncate"
               >{{ symbol.description }}
               <span :class="active ? 'text-blue-400' : 'text-gray-500'"
                 >({{ symbol.name }})</span
-              ></span
-            >
+              >
+            </span>
             <CheckIcon v-show="selected" class="w-5 h-5" />
           </li>
         </ListboxOption>
@@ -59,7 +61,7 @@
 </template>
 
 <script>
-import { ref, onMounted, computed, getCurrentInstance } from "vue";
+import { ref, computed, getCurrentInstance } from "vue";
 import {
   Listbox,
   ListboxButton,
@@ -80,18 +82,16 @@ export default {
     ChevronDownIcon,
   },
   setup() {
-    //const apollo = useApolloClient();
     const symbols = ref([]);
     const selectedStock = ref([]);
     const app = getCurrentInstance();
     const $apollo = app.appContext.config.globalProperties.$apollo;
 
-    onMounted(async () => {
-      const data = await $apollo.client.query({
+    $apollo.client
+      .query({
         query: getSymbols,
-      });
-      symbols.value = data.data.symbols;
-    });
+      })
+      .then((data) => (symbols.value = data.data.symbols));
 
     const getSymbol = computed(() => {
       return symbols.value.find(
@@ -108,10 +108,4 @@ export default {
 };
 </script>
 
-<style scoped>
-#s::first-word {
-  float: left;
-  font-size: 300%;
-  margin: 0 10px 10px 0;
-}
-</style>
+<style scoped></style>

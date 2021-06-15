@@ -1,5 +1,9 @@
 <template>
-  <div class="p-4 text-gray-300 rounded-2xl bg-custom-secondary">
+  <StocksTableSkeleton v-if="quotes.length === 0" />
+  <div
+    v-else
+    class="p-4 text-gray-300 rounded-2xl bg-custom-secondary max-w-7xl"
+  >
     <div class="grid grid-cols-7 gap-1 pb-4 border-b border-gray-800 max-w-7xl">
       <div class="font-medium">Name</div>
       <div class="font-medium text-right">High</div>
@@ -12,19 +16,15 @@
 
     <div v-for="quote in filteredQuotes" :key="quote.symbol">
       <router-link
-        :to="{ name: 'StockDetails', params: { symbol: quote.symbol } }"
+        :to="{
+          name: 'StockDetails',
+          params: { symbol: quote.symbol },
+        }"
       >
         <div
           class="relative grid grid-cols-7 gap-1 py-4 text-gray-300 border-b border-gray-800 cursor-pointer  group hover:text-gray-400 max-w-7xl whitespace-nowrap"
         >
-          <div
-            class="truncate"
-            v-tooltip="{
-              content: quote.name,
-              delay: { show: 0, hide: 0 },
-              placement: 'bottom',
-            }"
-          >
+          <div class="truncate">
             {{ quote.name }}
             <span class="text-gray-500 group-hover:text-gray-700"
               >({{ quote.symbol }})</span
@@ -101,7 +101,7 @@
           "
         />
       </button>
-      <div>Page {{ page }} of 3</div>
+      <div class="text-gray-400">Page {{ page }} of 3</div>
       <button
         class="rounded-md focus:outline-none focus:ring-2 focus:ring-blue-900"
         :disabled="page === 3 ? true : false"
@@ -122,12 +122,10 @@
 import { ref, computed, getCurrentInstance } from "vue";
 import { ChevronLeftIcon, ArrowDownIcon } from "@heroicons/vue/solid";
 import { allQuotes } from "../graphql/subscriptions.js";
+import StocksTableSkeleton from "../components/StocksTableSkeleton.vue";
 
 export default {
-  components: {
-    ChevronLeftIcon,
-    ArrowDownIcon,
-  },
+  components: { ChevronLeftIcon, ArrowDownIcon, StocksTableSkeleton },
   setup() {
     const page = ref(1);
     const quotes = ref([]);
@@ -159,6 +157,7 @@ export default {
     return {
       filteredQuotes,
       page,
+      quotes,
     };
   },
 };

@@ -4,8 +4,13 @@
     class="relative flex-grow p-4 bg-custom-secondary rounded-xl"
     style="height: 500px"
   >
-    <div class="text-2xl font-medium text-gray-200">&#8364; {{ price }}</div>
-    <div class="ml-0.5 text-xs text-gray-400">{{ time }}</div>
+    <Spinner v-if="!smbl.length" />
+    <div v-if="smbl.length" class="text-2xl font-medium text-gray-200">
+      &#8364; {{ price }}
+    </div>
+    <div v-if="smbl.length" class="ml-0.5 text-xs text-gray-400">
+      {{ time }}
+    </div>
     <div class="absolute bottom-0" ref="chartRef"></div>
   </div>
 </template>
@@ -14,6 +19,7 @@
 import { ref, onMounted, watch } from "vue";
 import { createChart } from "lightweight-charts";
 import { chartConfig, candlestickConfig } from "../config/chart/config.js";
+import Spinner from "../components/Spinner.vue";
 
 function getUnixTimestamp(timestamp) {
   return (
@@ -48,6 +54,7 @@ function formatTime(timestamp) {
 
 export default {
   props: ["symbol", "quotes"],
+  components: { Spinner },
   setup(props) {
     const smbl = ref([]);
     const chartRef = ref(null);

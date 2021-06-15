@@ -1,18 +1,21 @@
 <template>
   <div class="flex flex-col items-center justify-center w-screen space-y-16">
     <div
-      class="z-50 w-full max-w-lg p-4 space-y-4 rounded-2xl bg-custom-secondary"
+      class="z-10 w-full max-w-lg p-4 space-y-4 rounded-2xl bg-custom-secondary"
     >
       <StocksDropdown />
       <div class="flex space-x-2">
         <div class="w-full">
           <label class="sr-only">Price</label>
           <div
-            class="flex w-full px-3 py-4 font-medium text-left text-gray-100 bg-gray-800 rounded-lg  focus:outline-none"
+            class="flex w-full px-3 py-4 font-medium text-left text-gray-100 rounded-lg  bg-custom-tertiary focus:outline-none"
           >
             <input
               id="price"
-              type="text"
+              type="number"
+              step="0.01"
+              min="0"
+              v-model="price"
               class="w-full bg-gray-800  sm:text-sm sm:leading-5 focus:outline-none"
               placeholder="Price"
             />
@@ -22,13 +25,15 @@
         <div class="w-full">
           <label class="sr-only">Date</label>
           <div
-            class="flex items-center w-full px-3 py-4 font-medium text-left text-gray-100 bg-gray-800 rounded-lg  focus:outline-none"
+            class="relative flex items-center w-full px-3 py-4 font-medium text-left text-gray-100 rounded-lg  bg-custom-tertiary focus:outline-none"
           >
             <input
               id="calendar"
               type="text"
-              class="w-full bg-gray-800  sm:text-sm sm:leading-5 focus:outline-none disabled"
+              v-model="date"
+              class="w-full h-5 bg-gray-800  sm:text-sm sm:leading-5 focus:outline-none disabled"
               placeholder="Date"
+              onfocus="(this.type='datetime-local')"
             />
             <label for="calendar"><CalendarIcon class="w-5 h-5" /></label>
           </div>
@@ -37,20 +42,20 @@
       <div class="flex">
         <button
           v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold text-blue-200 bg-blue-800 rounded-lg  text-md hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-700"
+          class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-700"
           @click.prevent="handler"
         >
-          <CloudIcon class="w-5 h-5 text-blue-200" />
+          <CloudIcon class="w-5 h-5 text-blue-100" />
           <span class="pl-1 text-md">Connect Wallet</span>
         </button>
       </div>
     </div>
-    <div><StocksTable /></div>
+    <div class="w-full max-w-7xl"><StocksTable /></div>
   </div>
 </template>
 
 <script>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useStore } from "vuex";
 import StocksDropdown from "../components/StocksDropdown.vue";
 import StocksTable from "../components/StocksTable.vue";
@@ -71,14 +76,31 @@ export default {
     CalendarIcon,
   },
   setup() {
+    const price = ref("");
+    const date = ref("");
+
     const handler = () => {
       initWeb3();
     };
+
     const store = useStore();
     const name = computed(() => {
       return store.state.user.name;
     });
-    return { name, handler };
+
+    return { name, price, date, handler };
   },
 };
 </script>
+
+<style scoped>
+input[type="datetime-local"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  margin-right: 0.7rem;
+  color: transparent;
+  background: transparent;
+  right: 0;
+  -webkit-appearance: none;
+}
+</style>

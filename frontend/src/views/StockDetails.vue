@@ -1,9 +1,17 @@
 <template>
-  <div class="flex flex-col mx-auto max-w-7xl">
-    <div class="font-medium text-gray-300 mt-6text-base">
-      <span class="text-gray-400">Home > Stocks ></span> {{ symbol }}
+  <div class="flex flex-col p-4 mx-auto max-w-7xl md:p-0">
+    <div class="z-10 font-medium text-gray-300 mt-6text-base">
+      <span class="text-gray-400"
+        ><router-link :to="{ name: 'Home' }" class="hover:text-gray-300"
+          >Home</router-link
+        >
+        > Stocks ></span
+      >
+      {{ symbol }}
     </div>
-    <div class="flex justify-between mt-6">
+    <div
+      class="z-10 flex flex-col justify-between mt-6 space-y-2  md:space-y-0 md:flex-row"
+    >
       <div class="flex flex-col text-base">
         <div v-if="quotes.length" class="text-xl text-gray-200">
           {{ quotes[0].description }}
@@ -43,6 +51,16 @@
                   0
                 "
                 class="w-4 h-4"
+                :class="
+                  Math.round(
+                    quotes[0].quotes[quotes[0].quotes.length - 1]
+                      .change_percent * 100
+                  ) /
+                    100 <
+                  0
+                    ? ''
+                    : 'transform rotate-180'
+                "
               />&nbsp;
               <div>
                 {{
@@ -60,18 +78,20 @@
       <div class="flex items-end">
         <button
           v-wave
-          class="px-6 py-2 text-blue-100 bg-blue-600 rounded-lg  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="z-10 px-6 py-2 text-blue-100 bg-blue-600 rounded-lg  hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
         >
           Predict
         </button>
       </div>
     </div>
-    <div class="z-10 flex mt-4 space-x-4">
+    <div
+      class="z-10 flex flex-col mt-4 space-y-4  md:flex-row md:space-y-0 md:space-x-4"
+    >
+      <QuotesSkeleton v-if="!quotes.length" />
       <Quotes
         v-if="quotes.length"
         :quotes="quotes[0].quotes[quotes[0].quotes.length - 1]"
       />
-
       <Chart :symbol="symbol" :quotes="quotes" />
     </div>
   </div>
@@ -80,13 +100,14 @@
 <script>
 import Chart from "../components/Chart.vue";
 import Quotes from "../components/Quotes.vue";
+import QuotesSkeleton from "../components/QuotesSkeleton.vue";
 import { ref, getCurrentInstance } from "vue";
 import { filteredQuotes } from "../graphql/subscriptions.js";
 import { ArrowDownIcon } from "@heroicons/vue/solid";
 
 export default {
   props: ["symbol"],
-  components: { Chart, Quotes, ArrowDownIcon },
+  components: { Chart, Quotes, QuotesSkeleton, ArrowDownIcon },
   setup(props) {
     const app = getCurrentInstance();
     const $apollo = app.appContext.config.globalProperties.$apollo;
@@ -102,7 +123,6 @@ export default {
     quoteObserver.subscribe({
       next(data) {
         quotes.value = data.data.symbols;
-        console.log(quotes.value);
       },
       error(error) {
         console.error(error);
