@@ -31,6 +31,13 @@ export default {
       state.repBalance = payload.repBalance;
       state.web3 = payload.web3;
     },
+    RESET_USER(state) {
+      state.address = "";
+      state.network = "";
+      state.ethBalance = "";
+      state.repBalance = "";
+      state.web3 = "";
+    },
   },
 
   actions: {

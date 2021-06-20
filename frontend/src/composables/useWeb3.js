@@ -1,5 +1,16 @@
 import Web3 from "web3";
 import { store } from "../main.js";
+//import PrecictionsDB from "../../../src/abis/PredictionsDB.json";
+
+// const convertArray = (arr) => {
+//   return arr.map(function (x) {
+//     return {
+//       price: x["price"],
+//       date: x["date"],
+//       symbol: x["symbol"],
+//     };
+//   });
+// };
 
 const loadData = async (web3) => {
   const [accounts, networkId, block] = await Promise.all([
@@ -18,6 +29,28 @@ const loadData = async (web3) => {
   store.commit("eth/SET_ETH", {
     block,
   });
+  //const predictionsDBdata = PrecictionsDB.networks[networkId];
+  // const predictionsDB = new web3.eth.Contract(
+  //   PrecictionsDB.abi,
+  //   predictionsDBdata.address
+  // );
+  // console.log(predictionsDB);
+  // predictionsDB.events
+  //   .PredictionAdded(
+  //     {
+  //       filter: {},
+  //     },
+  //     function (error, event) {
+  //       console.log(error);
+  //       console.log(event);
+  //     }
+  //   )
+  //   .on("data", function (event) {
+  //     console.log(event.returnValues.symbol); // same results as the optional callback above
+  //   })
+  //   .on("error", console.error);
+  // const test = await predictionsDB.methods.getPredictions(accounts[0]).call();
+  // console.log(convertArray(test));
 };
 
 export function initWeb3() {
@@ -35,10 +68,14 @@ export function initWeb3() {
     loadData(web3);
   }
   // event handlers
-  window.ethereum.on("accountsChanged", () => {
-    loadData(web3);
+  web3.currentProvider.on("accountsChanged", (address) => {
+    if (address[0]) {
+      loadData(web3);
+    } else {
+      store.commit("user/RESET_USER");
+    }
   });
-  window.ethereum.on("chainChanged", () => {
+  web3.currentProvider.on("chainChanged", () => {
     loadData(web3);
   });
   web3.eth.subscribe("newBlockHeaders").on("data", async (block) => {

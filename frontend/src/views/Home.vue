@@ -3,7 +3,7 @@
     <div
       class="z-10 w-full max-w-lg p-4 space-y-4 rounded-2xl bg-custom-secondary"
     >
-      <StocksDropdown :selected="selected" />
+      <StocksDropdown @stockSelected="setPriceAndDate" :selected="selected" />
       <div class="flex space-x-2">
         <div class="w-full">
           <label class="sr-only">Price</label>
@@ -43,10 +43,15 @@
         <button
           v-wave
           class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
-          @click.prevent="handler"
+          @click.prevent="connectWallet"
         >
-          <CloudIcon class="w-5 h-5 text-blue-100" />
-          <span class="pl-1 text-md">Connect Wallet</span>
+          <CloudIcon
+            v-if="!store.getters['user/getAddress']"
+            class="w-5 h-5 text-blue-100"
+          />
+          <span class="pl-1 text-md">{{
+            store.getters["user/getAddress"] ? "Connected" : "Connect Wallet"
+          }}</span>
         </button>
       </div>
     </div>
@@ -55,8 +60,9 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
 import StocksDropdown from "../components/Predictions/StocksDropdown.vue";
 import StocksTable from "../components/StocksTable/StocksTable.vue";
 import {
@@ -77,6 +83,7 @@ export default {
   },
   props: ["selected"],
   setup(props) {
+    const store = useStore();
     const price = ref(props.selected ? props.selected.price : "");
     const date = ref(
       props.selected
@@ -86,11 +93,26 @@ export default {
     );
     const route = useRoute();
 
-    const handler = () => {
+    const connectWallet = () => {
       initWeb3();
     };
 
-    return { price, date, route, handler };
+    const setPriceAndDate = (symbol) => {
+      date.value =
+        new Date().toISOString().substring(0, 11) +
+        new Date().toLocaleTimeString().substring(0, 5);
+      price.value = Number(
+        store.getters["quotes/getQuotes"].quotes.find(
+          (quote) => quote.symbol === symbol
+        ).close
+      ).toFixed(2);
+    };
+
+    watchEffect(() => {
+      console.log(date.value);
+    });
+
+    return { price, date, route, connectWallet, setPriceAndDate, store };
   },
 };
 </script>

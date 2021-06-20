@@ -19,6 +19,10 @@ const networks = [
     name: "Kovan",
     explorer: "https://kovan.etherscan.io",
   },
+  {
+    id: 5777,
+    name: "Ganache",
+  },
 ];
 
 export { networks };

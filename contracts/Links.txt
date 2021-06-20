@@ -1,1 +1,0 @@
-https://remix.ethereum.org/#version=soljson-v0.6.7+commit.b8d736ae.js&optimize=false&evmVersion=null&gist=2324e6830b66ea954b674748b7676c58&runs=200 

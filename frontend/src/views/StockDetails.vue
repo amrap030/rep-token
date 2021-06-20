@@ -99,9 +99,11 @@
     <div
       class="z-10 flex flex-col mt-4 space-y-4  md:flex-row md:space-y-0 md:space-x-4"
     >
-      <QuotesSkeleton v-if="!quotes.length" />
+      <QuotesSkeleton
+        v-if="(quotes[0] && quotes[0].quotes.length < 2) || !quotes.length"
+      />
       <Quotes
-        v-if="quotes.length"
+        v-if="quotes[0] && quotes[0].quotes.length > 1"
         :quotes="quotes[0].quotes[quotes[0].quotes.length - 1]"
       />
       <CandleChart :symbol="symbol" :quotes="quotes" />
@@ -116,14 +118,31 @@ import QuotesSkeleton from "../components/Quotes/QuotesSkeleton.vue";
 import { ref, getCurrentInstance } from "vue";
 import { filteredQuotes } from "../graphql/subscriptions.js";
 import { ArrowDownIcon } from "@heroicons/vue/solid";
+import { useStore } from "vuex";
 
 export default {
   props: ["symbol"],
   components: { CandleChart, Quotes, QuotesSkeleton, ArrowDownIcon },
   setup(props, { emit }) {
+    const store = useStore();
     const app = getCurrentInstance();
     const $apollo = app.appContext.config.globalProperties.$apollo;
-    const quotes = ref([]);
+    const quote = store.getters["quotes/getQuotes"].quotes.find(
+      (quote) => quote.symbol === props.symbol
+    );
+    const quotes = ref(
+      quote
+        ? [
+            {
+              description: quote.name,
+              name: quote.symbol,
+              quotes: [
+                { close: quote.close, change_percent: quote.change_percent },
+              ],
+            },
+          ]
+        : []
+    );
 
     const quoteObserver = $apollo.client.subscribe({
       query: filteredQuotes,

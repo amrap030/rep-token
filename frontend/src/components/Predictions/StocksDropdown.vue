@@ -38,6 +38,7 @@
           v-for="symbol in symbols"
           :key="symbol.name"
           :value="symbol.description"
+          @click.prevent="emit('stockSelected', symbol.name)"
         >
           <li
             v-wave
@@ -82,7 +83,7 @@ export default {
     ChevronDownIcon,
   },
   props: ["selected"],
-  setup(props) {
+  setup(props, { emit }) {
     const symbols = ref([]);
     const selectedStock = ref([]);
     const app = getCurrentInstance();
@@ -114,6 +115,7 @@ export default {
       selectedStock,
       symbols,
       getSymbol,
+      emit,
     };
   },
 };

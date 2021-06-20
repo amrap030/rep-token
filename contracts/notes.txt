@@ -1,2 +1,0 @@
-Kovan Netzwerk
-repTokenDB: 0x11E935857bA0Cd895c707af9B712A146b4002746
