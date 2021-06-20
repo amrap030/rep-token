@@ -7,23 +7,26 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 contract RepToken is ChainlinkClient {
     using SafeMath for uint256;
 
-    address payable public owner;
-    string public constant symbol = "REP";
-    string public constant name = "REP Token";
-    uint256 public totalSupply_;
-    uint256 public volume;
-    address private oracle;
-    bytes32 private jobId;
-    uint256 private fee;
-    bytes32[] public ids;
-
     constructor() public {
         owner = payable(msg.sender);
         setPublicChainlinkToken();
         oracle = 0x3A56aE4a2831C3d3514b5D7Af5578E45eBDb7a40;
         jobId = "187bb80e5ee74a139734cac7475f3c6e";
-        fee = 0.01 * 10**18; // 0.1 LINK
+        fee = 0.01 * 10**18; // 0.01 LINK
     }
+
+    address payable public owner;
+    address private oracle;
+
+    string public constant symbol = "REP";
+    string public constant name = "REP Token";
+
+    uint256 public totalSupply;
+    uint256 public volume;
+    uint256 private fee;
+
+    bytes32 private jobId;
+    bytes32[] public ids;
 
     struct Prediction {
         address predictor;
@@ -31,9 +34,10 @@ contract RepToken is ChainlinkClient {
         string date;
         uint256 unixDate;
         uint256 price;
+        bool checked;
     }
 
-    mapping(address => uint256) public balances_;
+    mapping(address => uint256) public balanceOf;
     mapping(address => Prediction[]) public predictions;
     mapping(bytes32 => Prediction) public requestMapping;
 
@@ -43,9 +47,7 @@ contract RepToken is ChainlinkClient {
         string date,
         uint256 price
     );
-
     event RepTokensMinted(address indexed to, uint256 totalSupply);
-
     event RepTokensBurned(address indexed from, uint256 totalSupply);
 
     function addPrediction(
@@ -55,18 +57,15 @@ contract RepToken is ChainlinkClient {
         uint256 _price
     ) external {
         require(
-            _unixDate.div(3600).mod(24) >= 9 &&
-                _unixDate.div(3600).mod(24) <= 17,
-            "Date is not within opening and closing hours of Xetra stock market!"
+            _unixDate.div(3600).mod(24) >= 7 &&
+                _unixDate.div(3600).mod(24) <= 15,
+            "Insufficient date!"
         );
-        if (_unixDate.div(3600).mod(24) == 17) {
-            require(
-                _unixDate.div(60).mod(60) <= 30,
-                "Date is not within opening and closing hours of Xetra stock market!"
-            );
+        if (_unixDate.div(3600).mod(24) == 15) {
+            require(_unixDate.div(60).mod(60) <= 30, "Insufficient date!");
         }
         predictions[msg.sender].push(
-            Prediction(msg.sender, _symbol, _date, _unixDate, _price)
+            Prediction(msg.sender, _symbol, _date, _unixDate, _price, false)
         );
         emit PredictionAdded(msg.sender, _symbol, _date, _price);
     }
@@ -81,11 +80,14 @@ contract RepToken is ChainlinkClient {
 
     function evaluatePredictions(address _predictor) external {
         require(
-            _predictor == msg.sender,
-            "You are not the predictor or you currently have no predictions!"
+            _predictor == msg.sender && predictions[_predictor].length > 0,
+            "Not the predictor or no predictions!"
         );
-        for (uint256 i = predictions[_predictor].length; i > 0; i--) {
-            if (predictions[_predictor][i - 1].unixDate > block.timestamp) {
+        for (uint256 i = predictions[_predictor].length; i > 0; i = i.sub(1)) {
+            if (
+                predictions[_predictor][i - 1].unixDate > block.timestamp ||
+                predictions[_predictor][i - 1].checked == true
+            ) {
                 continue;
             } else {
                 bytes32 requestId =
@@ -93,20 +95,11 @@ contract RepToken is ChainlinkClient {
                         predictions[_predictor][i - 1].symbol,
                         predictions[_predictor][i - 1].date
                     );
+                predictions[_predictor][i - 1].checked = true;
                 requestMapping[requestId] = predictions[_predictor][i - 1];
                 ids.push(requestId);
-                delete predictions[_predictor][i - 1];
             }
         }
-        // for (uint256 i = 0; i < predictions[_predictor].length; i++) {
-        //     bytes32 requestId =
-        //         requestStockPrice(
-        //             predictions[_predictor][i].symbol,
-        //             predictions[_predictor][i].date
-        //         );
-        //     ids.push(requestId);
-        //     requestMapping[requestId] = predictions[_predictor][i];
-        // }
     }
 
     function requestStockPrice(string memory _symbol, string memory _date)
@@ -143,46 +136,45 @@ contract RepToken is ChainlinkClient {
         pure
         returns (uint256)
     {
-        require(_b >= 0);
         bytes memory bresult = bytes(_a);
-        uint256 mintt = 0;
-        bool decimals = false;
-        for (uint256 i = 0; i < bresult.length; i++) {
+        uint256 mintt;
+        bool decimals;
+        for (uint256 i = 0; i < bresult.length; i = i.add(1)) {
             if ((uint8(bresult[i]) >= 48) && (uint8(bresult[i]) <= 57)) {
                 if (decimals) {
                     if (_b == 0) break;
-                    else _b--;
+                    else _b = _b.sub(1);
                 }
-                mintt *= 10;
-                mintt += uint8(bresult[i]) - 48;
+                mintt = mintt.mul(10);
+                mintt = mintt.add(uint8(bresult[i]) - 48);
             } else if (uint8(bresult[i]) == 46) decimals = true;
         }
-        if (_b > 0) mintt *= 10**_b;
+        if (_b > 0) mintt = mintt.mul(10**_b);
         return mintt;
     }
 
     function mint(address _predictor) private {
-        totalSupply_ = totalSupply_.add(1);
-        balances_[_predictor] = balances_[_predictor].add(1);
-        emit RepTokensMinted(msg.sender, totalSupply_);
+        totalSupply = totalSupply.add(1);
+        balanceOf[_predictor] = balanceOf[_predictor].add(1);
+        emit RepTokensMinted(msg.sender, totalSupply);
     }
 
     function burn(address _predictor) private {
-        totalSupply_ = totalSupply_.sub(1);
-        balances_[_predictor] = balances_[_predictor].sub(1);
-        emit RepTokensBurned(msg.sender, totalSupply_);
+        totalSupply = totalSupply.sub(1);
+        balanceOf[_predictor] = balanceOf[_predictor].sub(1);
+        emit RepTokensBurned(msg.sender, totalSupply);
     }
 
     function fulfillEvaluation(bytes32 _requestId, bytes32 _close)
         public
         recordChainlinkFulfillment(_requestId)
     {
-        uint8 i = 0;
+        uint256 i;
         while (i < 32 && _close[i] != 0) {
-            i++;
+            i = i.add(1);
         }
         bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _close[i] != 0; i++) {
+        for (i = 0; i < 32 && _close[i] != 0; i = i.add(1)) {
             bytesArray[i] = _close[i];
         }
         uint256 close = parseInt(string(bytesArray), 5);
@@ -192,13 +184,11 @@ contract RepToken is ChainlinkClient {
         } else {
             burn(requestMapping[_requestId].predictor);
         }
+        delete requestMapping[_requestId];
     }
 
     function kill() public {
-        require(
-            msg.sender == owner,
-            "Only the contract owner can kill the contract, sorry."
-        );
+        require(msg.sender == owner, "Not the contract creator.");
         selfdestruct(owner);
     }
 
@@ -207,7 +197,7 @@ contract RepToken is ChainlinkClient {
             LinkTokenInterface(chainlinkTokenAddress());
         require(
             linkToken.transfer(msg.sender, linkToken.balanceOf(address(this))),
-            "Unable to transfer"
+            "Unable to transfer."
         );
     }
 }
