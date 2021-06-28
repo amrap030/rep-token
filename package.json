@@ -13,7 +13,9 @@
   },
   "homepage": "https://github.com/amrap030/rep-token#readme",
   "dependencies": {
-    "@chainlink/contracts": "^0.1.7",
+    "@babel/polyfill": "^7.12.1",
+    "@babel/register": "^7.14.5",
+    "@chainlink/contracts": "^0.1.9",
     "@openzeppelin/contracts": "^3.4.0",
     "@truffle/hdwallet-provider": "^1.4.1",
     "chai": "^4.3.4",
