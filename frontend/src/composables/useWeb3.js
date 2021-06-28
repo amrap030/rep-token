@@ -1,6 +1,6 @@
 import Web3 from "web3";
 import { store } from "../main.js";
-//import PrecictionsDB from "../../../src/abis/PredictionsDB.json";
+import PredictionsDB from "../../../src/abis/PredictionsDB.json";
 
 // const convertArray = (arr) => {
 //   return arr.map(function (x) {
@@ -29,11 +29,14 @@ const loadData = async (web3) => {
   store.commit("eth/SET_ETH", {
     block,
   });
-  //const predictionsDBdata = PrecictionsDB.networks[networkId];
-  // const predictionsDB = new web3.eth.Contract(
-  //   PrecictionsDB.abi,
-  //   predictionsDBdata.address
-  // );
+  const predictionsDBdata = PredictionsDB.networks[networkId];
+  const predictionsDB = new web3.eth.Contract(
+    PredictionsDB.abi,
+    predictionsDBdata.address
+  );
+  const test = await predictionsDB.methods.getPredictions(accounts[0]).call();
+  console.log(test);
+  web3.eth.getGasPrice().then(console.log);
   // console.log(predictionsDB);
   // predictionsDB.events
   //   .PredictionAdded(

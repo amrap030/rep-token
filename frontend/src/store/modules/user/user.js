@@ -1,5 +1,7 @@
 import { networks } from "../../../config/networks/config.js";
 
+const DECIMALS = 10 ** 18;
+
 export default {
   getters: {
     getUser(state) {
@@ -13,7 +15,7 @@ export default {
       return network;
     },
     getEthBalance(state) {
-      return state.ethBalance;
+      return Number(state.ethBalance / DECIMALS).toFixed(4);
     },
     getRepBalance(state) {
       return state.repBalance;

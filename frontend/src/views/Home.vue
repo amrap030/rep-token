@@ -42,15 +42,33 @@
       <div class="flex">
         <button
           v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="flex items-center justify-center w-full py-4 font-semibold rounded-lg  text-md focus:outline-none focus:ring-2"
           @click.prevent="connectWallet"
+          :class="
+            store.getters['user/getAddress']
+              ? store.getters['user/getEthBalance'] > 0
+                ? 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus:ring-blue-600'
+                : 'text-red-400 ring-2 ring-red-900 bg-red-900 bg-opacity-25 cursor-not-allowed'
+              : 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus:ring-blue-600'
+          "
+          :disabled="
+            store.getters['user/getAddress']
+              ? store.getters['user/getEthBalance'] > 0
+                ? false
+                : true
+              : false
+          "
         >
           <CloudIcon
             v-if="!store.getters['user/getAddress']"
             class="w-5 h-5 text-blue-100"
           />
           <span class="pl-1 text-md">{{
-            store.getters["user/getAddress"] ? "Connected" : "Connect Wallet"
+            store.getters["user/getAddress"]
+              ? store.getters["user/getEthBalance"] > 0
+                ? "Predict"
+                : "Insufficient ETH balance"
+              : "Connect Wallet"
           }}</span>
         </button>
       </div>
@@ -60,7 +78,7 @@
 </template>
 
 <script>
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import StocksDropdown from "../components/Predictions/StocksDropdown.vue";
@@ -107,10 +125,6 @@ export default {
         ).close
       ).toFixed(2);
     };
-
-    watchEffect(() => {
-      console.log(date.value);
-    });
 
     return { price, date, route, connectWallet, setPriceAndDate, store };
   },
