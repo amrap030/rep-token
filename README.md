@@ -8,7 +8,7 @@
 npm install
 ```
 
-2. Add .env file containing the following stuff (ask @amrap030)
+2. Add .env file at the root of the repository, containing the following stuff (ask @amrap030)
 
 ```
 MNEMONIC={mnemonic seed phrase of metamask}
