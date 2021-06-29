@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import { store } from "../main.js";
 import PredictionsDB from "../../../src/abis/PredictionsDB.json";
+import RepToken from "../../../src/abis/RepToken.json";
 
 // const convertArray = (arr) => {
 //   return arr.map(function (x) {
@@ -19,24 +20,27 @@ const loadData = async (web3) => {
     web3.eth.getBlockNumber(),
   ]);
   const ethBalance = await web3.eth.getBalance(accounts[0]);
-  store.dispatch("user/initUser", {
-    address: accounts[0],
-    network: networkId,
-    ethBalance: ethBalance,
-    repBalance: 0,
-    web3: web3,
-  });
-  store.commit("eth/SET_ETH", {
-    block,
-  });
   const predictionsDBdata = PredictionsDB.networks[networkId];
   const predictionsDB = new web3.eth.Contract(
     PredictionsDB.abi,
     predictionsDBdata.address
   );
+  const repTokenDBdata = RepToken.networks[networkId];
+  const repToken = new web3.eth.Contract(RepToken.abi, repTokenDBdata.address);
+  store.dispatch("user/initUser", {
+    address: accounts[0],
+    network: networkId,
+    ethBalance: ethBalance,
+    repBalance: 0,
+    web3,
+    predictionsDB,
+    repToken,
+  });
+  store.commit("eth/SET_ETH", {
+    block,
+  });
   const test = await predictionsDB.methods.getPredictions(accounts[0]).call();
   console.log(test);
-  web3.eth.getGasPrice().then(console.log);
   // console.log(predictionsDB);
   // predictionsDB.events
   //   .PredictionAdded(

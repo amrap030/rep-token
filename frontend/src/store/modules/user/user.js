@@ -23,6 +23,12 @@ export default {
     getWeb3(state) {
       return state.web3;
     },
+    getPredictionsDB(state) {
+      return state.predictionsDB;
+    },
+    getRepToken(state) {
+      return state.repToken;
+    },
   },
 
   mutations: {
@@ -32,6 +38,8 @@ export default {
       state.ethBalance = payload.ethBalance;
       state.repBalance = payload.repBalance;
       state.web3 = payload.web3;
+      state.predictionsDB = payload.predictionsDB;
+      state.repToken = payload.repToken;
     },
     RESET_USER(state) {
       state.address = "";
@@ -39,6 +47,8 @@ export default {
       state.ethBalance = "";
       state.repBalance = "";
       state.web3 = "";
+      state.predictionsDB = "";
+      state.repToken = "";
     },
   },
 

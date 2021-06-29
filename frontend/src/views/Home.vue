@@ -40,37 +40,7 @@
         </div>
       </div>
       <div class="flex">
-        <button
-          v-wave
-          class="flex items-center justify-center w-full py-4 font-semibold rounded-lg  text-md focus:outline-none focus:ring-2"
-          @click.prevent="connectWallet"
-          :class="
-            store.getters['user/getAddress']
-              ? store.getters['user/getEthBalance'] > 0
-                ? 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus:ring-blue-600'
-                : 'text-red-400 ring-2 ring-red-900 bg-red-900 bg-opacity-25 cursor-not-allowed'
-              : 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus:ring-blue-600'
-          "
-          :disabled="
-            store.getters['user/getAddress']
-              ? store.getters['user/getEthBalance'] > 0
-                ? false
-                : true
-              : false
-          "
-        >
-          <CloudIcon
-            v-if="!store.getters['user/getAddress']"
-            class="w-5 h-5 text-blue-100"
-          />
-          <span class="pl-1 text-md">{{
-            store.getters["user/getAddress"]
-              ? store.getters["user/getEthBalance"] > 0
-                ? "Predict"
-                : "Insufficient ETH balance"
-              : "Connect Wallet"
-          }}</span>
-        </button>
+        <Button :data="{ date, price, symbol: smbl, ...selected }" />
       </div>
     </div>
     <div class="w-full max-w-7xl"><StocksTable /></div>
@@ -83,21 +53,17 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import StocksDropdown from "../components/Predictions/StocksDropdown.vue";
 import StocksTable from "../components/StocksTable/StocksTable.vue";
-import {
-  CloudIcon,
-  CurrencyDollarIcon,
-  CalendarIcon,
-} from "@heroicons/vue/solid";
-import { initWeb3 } from "../composables/useWeb3.js";
+import Button from "../components/Predictions/Button.vue";
+import { CurrencyDollarIcon, CalendarIcon } from "@heroicons/vue/solid";
 
 export default {
   name: "Home",
   components: {
     StocksDropdown,
     StocksTable,
-    CloudIcon,
     CurrencyDollarIcon,
     CalendarIcon,
+    Button,
   },
   props: ["selected"],
   setup(props) {
@@ -109,13 +75,11 @@ export default {
             new Date().toLocaleTimeString().substring(0, 5)
         : ""
     );
+    const smbl = ref("");
     const route = useRoute();
 
-    const connectWallet = () => {
-      initWeb3();
-    };
-
     const setPriceAndDate = (symbol) => {
+      smbl.value = symbol;
       date.value =
         new Date().toISOString().substring(0, 11) +
         new Date().toLocaleTimeString().substring(0, 5);
@@ -126,7 +90,13 @@ export default {
       ).toFixed(2);
     };
 
-    return { price, date, route, connectWallet, setPriceAndDate, store };
+    return {
+      price,
+      date,
+      route,
+      smbl,
+      setPriceAndDate,
+    };
   },
 };
 </script>

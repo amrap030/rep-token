@@ -7,6 +7,8 @@ const state = {
     ethBalance: "",
     repBalance: "",
     web3: "",
+    predictionsDB: "",
+    repToken: "",
   },
 };
 
