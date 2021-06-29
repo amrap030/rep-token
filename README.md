@@ -42,4 +42,4 @@ truffle run verify PredictionsDB --network live
 - **StockAPI**: 0x136181F10E45099a0efE156D782A1DC04Bc6dF97
 - **RepToken**: 0x8aCC78DE48C6158289A91Ee47f8F57eB5A520bF1
 
-You can view these contracts on https://rinkeby.etherscan.io/address/{address of contract}
+You can view these contracts on [https://rinkeby.etherscan.io/address/{address of contract}]https://rinkeby.etherscan.io/address/
