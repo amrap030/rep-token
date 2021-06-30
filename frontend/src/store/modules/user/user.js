@@ -10,6 +10,9 @@ export default {
     getAddress(state) {
       return state.address;
     },
+    getNetworkId(state) {
+      return state.network;
+    },
     getNetwork(state) {
       const network = networks.find((network) => network.id === state.network);
       return network;
@@ -38,8 +41,6 @@ export default {
       state.ethBalance = payload.ethBalance;
       state.repBalance = payload.repBalance;
       state.web3 = payload.web3;
-      state.predictionsDB = payload.predictionsDB;
-      state.repToken = payload.repToken;
     },
     RESET_USER(state) {
       state.address = "";
@@ -53,10 +54,19 @@ export default {
   },
 
   actions: {
-    initUser({ commit }, data) {
-      if (data) {
-        commit("SET_USER", data);
-      }
+    async initUser({ commit }, web3) {
+      const [accounts, networkId] = await Promise.all([
+        web3.eth.requestAccounts(),
+        web3.eth.net.getId(),
+      ]);
+      const ethBalance = await web3.eth.getBalance(accounts[0]);
+      commit("SET_USER", {
+        address: accounts[0],
+        network: networkId,
+        ethBalance: ethBalance,
+        repBalance: 0,
+        web3,
+      });
     },
   },
 };

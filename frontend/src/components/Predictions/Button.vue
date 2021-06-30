@@ -38,7 +38,8 @@
 <script>
 import { CloudIcon } from "@heroicons/vue/solid";
 import { useStore } from "vuex";
-import { initWeb3 } from "../../composables/useWeb3.js";
+import initWeb3 from "../../composables/useWeb3.js";
+import predictionsDBHelper from "../../composables/usePredictionsDB.js";
 
 export default {
   components: {
@@ -47,40 +48,24 @@ export default {
   props: ["data"],
   setup(props) {
     const store = useStore();
+    const { init } = initWeb3();
+    const { addPrediction } = predictionsDBHelper();
 
     const connectWallet = () => {
-      initWeb3();
+      init();
     };
 
     const dateToUnixTimestamp = () => {
-      const date = Math.floor(new Date(props.data.date).getTime() / 1000);
-      return date;
+      return Math.floor(new Date(props.data.date).getTime() / 1000);
     };
 
     const predict = async () => {
-      if (props.data.price && props.data.date && props.data.symbol) {
-        store.getters["user/getPredictionsDB"].methods
-          .addPrediction(
-            props.data.symbol,
-            props.data.date.replace("T", " "),
-            dateToUnixTimestamp(),
-            Number(props.data.price) * 100000
-          )
-          .send({ from: store.getters["user/getAddress"] })
-          .on("transactionHash", (hash) => {
-            console.log(hash);
-          })
-          .on("receipt", (receipt) => {
-            console.log(receipt);
-          })
-          .on("confirmation", (confirmationNumber, receipt) => {
-            console.log(confirmationNumber);
-            console.log(receipt);
-          })
-          .on("error", (err) => {
-            console.log(err);
-          });
-      }
+      await addPrediction(
+        props.data.symbol,
+        props.data.date.replace("T", " "),
+        dateToUnixTimestamp(),
+        Number(props.data.price) * 100000
+      );
     };
 
     return { store, connectWallet, predict };
