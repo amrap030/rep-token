@@ -2,7 +2,7 @@
   <button
     v-if="!store.getters['user/getAddress']"
     v-wave
-    class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md focus:outline-none focus:ring-2 hover:bg-blue-800 focus:ring-blue-600"
+    class="flex items-center justify-center w-full py-4 font-semibold text-blue-100 bg-blue-700 rounded-lg  text-md focus:outline-none focus-visible:ring-2 hover:bg-blue-800 focus-visible:ring-blue-600"
     @click.prevent="connectWallet"
   >
     <CloudIcon
@@ -14,11 +14,11 @@
   <button
     v-else
     v-wave
-    class="flex items-center justify-center w-full py-4 font-semibold rounded-lg  text-md focus:outline-none focus:ring-2"
+    class="flex items-center justify-center w-full py-4 font-semibold rounded-lg  text-md focus:outline-none focus-visible:ring-2"
     @click.prevent="predict"
     :class="
       store.getters['user/getEthBalance'] > 0
-        ? 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus:ring-blue-600'
+        ? 'text-blue-100 bg-blue-700 hover:bg-blue-800 focus-visible:ring-blue-600'
         : 'text-red-400 ring-2 ring-red-900 bg-red-900 bg-opacity-25 cursor-not-allowed'
     "
     :disabled="store.getters['user/getEthBalance'] > 0 ? false : true"
@@ -64,7 +64,7 @@ export default {
         props.data.symbol,
         props.data.date.replace("T", " "),
         dateToUnixTimestamp(),
-        Number(props.data.price) * 100000
+        Number(props.data.price * 100000).toFixed()
       );
     };
 

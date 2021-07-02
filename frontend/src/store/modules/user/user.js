@@ -1,6 +1,10 @@
 import { networks } from "../../../config/networks/config.js";
+import predictionsDBHelper from "../../../composables/usePredictionsDB.js";
+import repTokenHelper from "../../../composables/useRepToken.js";
 
 const DECIMALS = 10 ** 18;
+const { getPredictions } = predictionsDBHelper();
+const { getBalanceOf } = repTokenHelper();
 
 export default {
   getters: {
@@ -26,21 +30,31 @@ export default {
     getWeb3(state) {
       return state.web3;
     },
-    getPredictionsDB(state) {
-      return state.predictionsDB;
-    },
-    getRepToken(state) {
-      return state.repToken;
+    getPredictions(state) {
+      return state.predictions;
     },
   },
 
   mutations: {
-    SET_USER(state, payload) {
-      state.address = payload.address;
-      state.network = payload.network;
-      state.ethBalance = payload.ethBalance;
-      state.repBalance = payload.repBalance;
-      state.web3 = payload.web3;
+    SET_USER(state, user) {
+      state.address = user.address;
+      state.network = user.network;
+      state.ethBalance = user.ethBalance;
+      state.web3 = user.web3;
+      state.repBalance = user.repBalance;
+      state.predictions = user.predictions;
+    },
+    SET_PREDICTIONS(state, predictions) {
+      state.predictions = predictions;
+    },
+    SET_PREDICTION_CHECKED(state, unixDate) {
+      const index = state.predictions.findIndex(
+        (prediction) => prediction.unixDate === unixDate
+      );
+      state.predictions[index].checked = true;
+    },
+    SET_REP_BALANCE(state, balance) {
+      state.repBalance = balance;
     },
     RESET_USER(state) {
       state.address = "";
@@ -48,8 +62,10 @@ export default {
       state.ethBalance = "";
       state.repBalance = "";
       state.web3 = "";
-      state.predictionsDB = "";
-      state.repToken = "";
+      state.predictions = "";
+    },
+    ADD_PREDICTION(state, prediction) {
+      state.predictions.push(prediction);
     },
   },
 
@@ -64,9 +80,24 @@ export default {
         address: accounts[0],
         network: networkId,
         ethBalance: ethBalance,
-        repBalance: 0,
         web3,
+        repBalance: "",
+        prediction: "",
       });
+    },
+    async setPredictions({ commit }) {
+      try {
+        const predictions = await getPredictions();
+        commit("SET_PREDICTIONS", predictions);
+      } catch (err) {
+        commit("SET_PREDICTIONS", []);
+      }
+    },
+    async setRepBalance({ state, commit }) {
+      const repBalance = await getBalanceOf(state.address);
+      if (repBalance >= 0) {
+        commit("SET_REP_BALANCE", repBalance);
+      }
     },
   },
 };

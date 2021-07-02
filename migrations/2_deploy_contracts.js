@@ -13,4 +13,5 @@ module.exports = async function (deployer) {
   const repToken = await RepToken.deployed();
 
   await stockAPI.setCallerContract(repToken.address);
+  await predictionsDB.setCallerContract(repToken.address);
 };

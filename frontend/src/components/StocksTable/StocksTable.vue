@@ -6,7 +6,9 @@
     v-else
     class="p-4 text-gray-300 rounded-2xl bg-custom-secondary max-w-7xl"
   >
-    <div class="grid grid-cols-7 gap-1 pb-4 border-b border-gray-800 max-w-7xl">
+    <div
+      class="grid grid-cols-7 gap-1 pb-4 border-b border-gray-800  border-opacity-30 max-w-7xl"
+    >
       <div class="font-medium">Name</div>
       <div class="font-medium text-right">High</div>
       <div class="font-medium text-right">Open</div>
@@ -23,7 +25,7 @@
       class="flex items-center justify-center pt-4 space-x-4 text-center  max-w-7xl"
     >
       <button
-        class="rounded-md focus:outline-none focus:ring-2 focus:ring-blue-900"
+        class="rounded-md  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
         :disabled="page === 1 ? true : false"
         @click.prevent="page--"
       >
@@ -36,7 +38,7 @@
       </button>
       <div class="text-gray-400">Page {{ page }} of 3</div>
       <button
-        class="rounded-md focus:outline-none focus:ring-2 focus:ring-blue-900"
+        class="rounded-md  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
         :disabled="page === 3 ? true : false"
         @click.prevent="page++"
       >

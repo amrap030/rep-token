@@ -5,7 +5,11 @@
       <Navbar @select="setSelected" />
     </div>
     <div class="background"></div>
-    <router-view @stockSelected="setSelected" :selected="selected" />
+    <router-view
+      @stockSelected="setSelected"
+      :selected="selected"
+      class="w-full"
+    />
     <BlockInfo />
   </div>
 </template>

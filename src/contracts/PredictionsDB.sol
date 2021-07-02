@@ -26,12 +26,14 @@ contract PredictionsDB {
 
     // Payable address can receive Ether
     address payable public owner;
+    address private cbContract;
     mapping(address => Prediction[]) public predictions;
 
     // modifier that requires a date in unix format to be within Xetra opening hours
     modifier withinOpeningHours(uint256 _unixDate) {
         require(
-            _unixDate.div(3600).mod(24) >= 7 &&
+            _unixDate > now &&
+                _unixDate.div(3600).mod(24) >= 7 &&
                 _unixDate.div(3600).mod(24) <= 15 &&
                 _unixDate.div(86400).add(4).mod(7) >= 1 &&
                 _unixDate.div(86400).add(4).mod(7) <= 5,
@@ -55,6 +57,15 @@ contract PredictionsDB {
     // modifier that requires the contract owner
     modifier onlyOwner() {
         require(msg.sender == owner, "Caller is not the owner");
+        _;
+    }
+
+    // modifier that requires the contract owner
+    modifier onlyRepTokenContract() {
+        require(
+            msg.sender == cbContract,
+            "Caller is not the RepToken contract"
+        );
         _;
     }
 
@@ -93,6 +104,7 @@ contract PredictionsDB {
     function getPredictions(address _predictor)
         external
         view
+        onlyPredictors(_predictor)
         returns (
             string[] memory,
             string[] memory,
@@ -118,6 +130,28 @@ contract PredictionsDB {
         }
 
         return (symbols, dates, unixDates, prices, checks);
+    }
+
+    /**
+     * Function to set that a prediction was checked
+     *
+     * @param _predictor - the address of the predictor
+     * @param index - the index of the prediction
+     */
+    function setPredictionChecked(address _predictor, uint256 index)
+        external
+        onlyRepTokenContract
+    {
+        predictions[_predictor][index].checked = true;
+    }
+
+    /**
+     * Function to set the contract address that can call the StockAPI
+     *
+     * @param _cbContract - address of the calling contract for callback
+     */
+    function setCallerContract(address _cbContract) external onlyOwner {
+        cbContract = _cbContract;
     }
 
     function kill() external onlyOwner {

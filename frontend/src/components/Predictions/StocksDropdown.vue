@@ -6,7 +6,7 @@
     v-slot="{ open }"
   >
     <ListboxButton
-      class="flex items-center justify-between w-full px-3 py-4 font-medium text-left  focus:outline-none"
+      class="flex items-center justify-between w-full px-3 py-4 font-medium text-left rounded-lg  focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-opacity-50"
       ><span class="text-gray-100 truncate"
         >{{ selectedStock.length > 0 ? selectedStock : "Select a stock..." }}
         <span v-if="selectedStock.length > 0" class="text-gray-500"

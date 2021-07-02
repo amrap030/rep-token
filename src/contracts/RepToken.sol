@@ -28,23 +28,19 @@ contract RepToken is ChainlinkClient {
 
     string public constant symbol = "REP";
     string public constant name = "REP Token";
-    bytes32[] public ids;
 
     uint256 public totalSupply;
-    uint256 public volume;
     uint8 public decimals = 18;
 
-    struct Prediction {
+    struct Temp {
         address predictor;
-        string symbol;
-        string date;
-        uint256 unixDate;
         uint256 price;
-        bool checked;
+        uint256 index;
+        uint256 unixDate;
     }
 
     mapping(address => uint256) public balanceOf;
-    mapping(bytes32 => Prediction) public requestMapping;
+    mapping(bytes32 => Temp) private requestMapping;
 
     // modifier that requires the caller of the callback function to be the Chainlink oracle
     modifier recordClinkFulfillment(bytes32 _requestId) {
@@ -63,7 +59,7 @@ contract RepToken is ChainlinkClient {
     }
 
     // modifier that requires that a predictor has at least one prediction
-    modifier onlyPredictors(address _predictor) {
+    modifier predictionsAvailable(address _predictor) {
         (
             string[] memory symbols,
             string[] memory dates,
@@ -71,31 +67,41 @@ contract RepToken is ChainlinkClient {
             uint256[] memory prices,
             bool[] memory checks
         ) = predictionsDB.getPredictions(_predictor);
-        require(
-            _predictor == msg.sender && prices.length > 0,
-            "No predictions available!"
-        );
+        uint256 observations;
+        for (uint256 i = 0; i < prices.length; i = i.add(1)) {
+            if (checks[i] == false && unixDates[i] < now) {
+                observations = observations.add(1);
+            }
+        }
+        require(observations > 0, "No predictions available!");
         _;
     }
 
-    event RepTokensMinted(address indexed to, uint256 totalSupply);
-    event RepTokensBurned(address indexed from, uint256 totalSupply);
+    event RepTokensMinted(
+        address indexed to,
+        uint256 balanceOf,
+        uint256 amount
+    );
+    event RepTokensBurned(
+        address indexed from,
+        uint256 balanceOf,
+        uint256 amount
+    );
+    event PredictionEvaluated(address predictor, uint256 unixDate);
 
     /**
      * Function to evaluate predictions in the past to mint/burn REP Tokens from address
-     *
-     * @param _predictor - the address of the predictor
      */
-    function evaluatePredictions(address _predictor) external {
+    function evaluatePredictions() external predictionsAvailable(msg.sender) {
         (
             string[] memory symbols,
             string[] memory dates,
             uint256[] memory unixDates,
             uint256[] memory prices,
             bool[] memory checks
-        ) = predictionsDB.getPredictions(_predictor);
+        ) = predictionsDB.getPredictions(msg.sender);
         for (uint256 i = 0; i < prices.length; i = i.add(1)) {
-            if (unixDates[i] > block.timestamp || checks[i] == true) {
+            if (unixDates[i] > now || checks[i] == true) {
                 continue;
             } else {
                 bytes32 requestId = stockAPI.requestStockPrice(
@@ -104,16 +110,12 @@ contract RepToken is ChainlinkClient {
                     symbols[i],
                     dates[i]
                 );
-                checks[i] = true;
-                requestMapping[requestId] = Prediction(
-                    _predictor,
-                    symbols[i],
-                    dates[i],
-                    unixDates[i],
+                requestMapping[requestId] = Temp(
+                    msg.sender,
                     prices[i],
-                    checks[i]
+                    i,
+                    unixDates[i]
                 );
-                ids.push(requestId);
             }
         }
     }
@@ -152,9 +154,10 @@ contract RepToken is ChainlinkClient {
      * @param _predictor - the address of the predictor
      */
     function mint(address _predictor) private {
-        totalSupply = totalSupply.add(1);
-        balanceOf[_predictor] = balanceOf[_predictor].add(1);
-        emit RepTokensMinted(msg.sender, totalSupply);
+        uint256 amount = 1;
+        totalSupply = totalSupply.add(amount);
+        balanceOf[_predictor] = balanceOf[_predictor].add(amount);
+        emit RepTokensMinted(_predictor, balanceOf[_predictor], amount);
     }
 
     /**
@@ -163,9 +166,10 @@ contract RepToken is ChainlinkClient {
      * @param _predictor - the address of the predictor
      */
     function burn(address _predictor) private {
-        totalSupply = totalSupply.sub(1);
-        balanceOf[_predictor] = balanceOf[_predictor].sub(1);
-        emit RepTokensBurned(msg.sender, totalSupply);
+        uint256 amount = 1;
+        totalSupply = totalSupply.sub(amount);
+        balanceOf[_predictor] = balanceOf[_predictor].sub(amount);
+        emit RepTokensBurned(_predictor, balanceOf[_predictor], amount);
     }
 
     /**
@@ -187,12 +191,19 @@ contract RepToken is ChainlinkClient {
             bytesArray[i] = _close[i];
         }
         uint256 close = parseInt(string(bytesArray), 5);
-        volume = close;
         if (requestMapping[_requestId].price <= close) {
             mint(requestMapping[_requestId].predictor);
         } else {
             burn(requestMapping[_requestId].predictor);
         }
+        predictionsDB.setPredictionChecked(
+            requestMapping[_requestId].predictor,
+            requestMapping[_requestId].index
+        );
+        emit PredictionEvaluated(
+            requestMapping[_requestId].predictor,
+            requestMapping[_requestId].unixDate
+        );
         delete requestMapping[_requestId];
     }
 

@@ -6,7 +6,7 @@
     }"
   >
     <div
-      class="relative grid grid-cols-7 gap-1 py-4 text-gray-300 border-b border-gray-800 cursor-pointer  group hover:text-gray-400 max-w-7xl whitespace-nowrap"
+      class="grid grid-cols-7 gap-1 py-4 text-gray-300 border-b border-gray-800 cursor-pointer  border-opacity-30 group hover:text-gray-400 max-w-7xl whitespace-nowrap"
     >
       <div class="truncate">
         {{ quote.name }}

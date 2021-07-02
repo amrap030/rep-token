@@ -9,9 +9,11 @@ export default {
   },
 
   mutations: {
-    SET_ETH(state, payload) {
-      state.block = payload.block;
-      state.gasPrice = payload.gasPrice;
+    SET_BLOCK(state, block) {
+      state.block = block;
+    },
+    SET_GAS_PRICE(state, prices) {
+      state.gasPrice = prices;
     },
   },
 
