@@ -30,7 +30,7 @@
       >
         {{ store.getters["user/getNetwork"].name }}
       </div>
-      <Popver />
+      <Popover />
     </div>
   </div>
   <Pending v-if="store.getters['transactions/getTransactions'].length > 0" />
@@ -39,7 +39,7 @@
 
 <script>
 import { useStore } from "vuex";
-import Popver from "../User/Popover.vue";
+import Popover from "../User/Popover.vue";
 import Pending from "../UX/Pending.vue";
 import Spinner from "../UX/Spinner.vue";
 import Notifications from "../UX/Notifications.vue";
@@ -47,7 +47,7 @@ import repTokenHelper from "../../composables/useRepToken.js";
 
 export default {
   components: {
-    Popver,
+    Popover,
     Pending,
     Spinner,
     Notifications,
