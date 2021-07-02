@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center justify-center h-full mx-auto">
-    <svg class="w-8 h-8 mr-3 text-white animate-spin" viewBox="0 0 24 24">
+    <svg class="w-5 h-5 mr-3 text-white animate-spin" viewBox="0 0 24 24">
       <circle
         class="opacity-25"
         cx="12"

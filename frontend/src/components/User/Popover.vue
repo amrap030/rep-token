@@ -7,12 +7,12 @@
       <div class="px-2 py-1 rounded-md bg-background">{{ getAddress }}</div>
     </PopoverButton>
     <transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="translate-y-1 opacity-0"
-      enter-to-class="translate-y-0 opacity-100"
-      leave-active-class="transition duration-150 ease-in"
-      leave-from-class="translate-y-0 opacity-100"
-      leave-to-class="translate-y-1 opacity-0"
+      enter-active-class="transition duration-100 ease-out"
+      enter-from-class="transform scale-95 opacity-0"
+      enter-to-class="transform scale-100 opacity-100"
+      leave-active-class="transition duration-75 ease-out"
+      leave-from-class="transform scale-100 opacity-100"
+      leave-to-class="transform scale-95 opacity-0"
     >
       <PopoverPanel
         class="absolute right-0 z-10 px-4 mt-5 w-96 sm:px-0 lg:max-w-3xl"

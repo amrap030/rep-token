@@ -38,8 +38,8 @@ truffle run verify PredictionsDB --network live
 
 ## Current addresses
 
-- **PredictionsDB**: 0x5144bD1d5519E9F3a6EDac19db7681E4E7d99C42
-- **StockAPI**: 0x8322d43Ea3Fb6D6CB30Cd2bf014661E40F60fD43
-- **RepToken**: 0x8BB90E8ED1B2dec353CC0c80c49C6857a2EE1d94
+- **PredictionsDB**: 0x2fb51803F55Df3628C6bc76d00f9a15c206ADf2F
+- **StockAPI**: 0xEBe5f08154318a4D29d89f7183d1bE451ef557eC
+- **RepToken**: 0x56a1c1095e76C667C3a845b3f03E3ed9E98ae2ef
 
 You can view these contracts on [https://rinkeby.etherscan.io/address/{address of contract}](https://rinkeby.etherscan.io/address/)

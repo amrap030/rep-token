@@ -45,6 +45,29 @@ contract PredictionsDB {
         _;
     }
 
+    // modifier that requires that there is no similar prediction
+    modifier onlyNewPredictions(
+        address _predictor,
+        uint256 _unixDate,
+        string memory _symbol,
+        uint256 _price
+    ) {
+        bool existingPrediction;
+        for (uint256 i = 0; i < predictions[_predictor].length; i++) {
+            if (
+                predictions[_predictor][i].unixDate == _unixDate &&
+                (keccak256(
+                    abi.encodePacked((predictions[_predictor][i].symbol))
+                ) == keccak256(abi.encodePacked((_symbol)))) &&
+                predictions[_predictor][i].price == _price
+            ) {
+                existingPrediction = true;
+            }
+        }
+        require(existingPrediction == false, "Prediction already exists!");
+        _;
+    }
+
     // modifier that requires that a predictor has at least one prediction
     modifier onlyPredictors(address _predictor) {
         require(
@@ -89,7 +112,11 @@ contract PredictionsDB {
         string calldata _date,
         uint256 _unixDate,
         uint256 _price
-    ) external withinOpeningHours(_unixDate) {
+    )
+        external
+        withinOpeningHours(_unixDate)
+        onlyNewPredictions(msg.sender, _unixDate, _symbol, _price)
+    {
         predictions[msg.sender].push(
             Prediction(msg.sender, _symbol, _date, _unixDate, _price, false)
         );

@@ -49,6 +49,7 @@
       <GasPrices v-if="store.getters['user/getAddress']" />
     </div>
     <div class="w-full mt-16 max-w-7xl"><StocksTable /></div>
+    <div class="w-full mt-16 max-w-7xl"><Ranking /></div>
   </div>
 </template>
 
@@ -58,6 +59,7 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import StocksDropdown from "../components/Predictions/StocksDropdown.vue";
 import StocksTable from "../components/StocksTable/StocksTable.vue";
+import Ranking from "../components/Ranking/Ranking.vue";
 import Button from "../components/Predictions/Button.vue";
 import GasPrices from "../components/Predictions/GasPrices.vue";
 import { CurrencyDollarIcon, CalendarIcon } from "@heroicons/vue/solid";
@@ -71,6 +73,7 @@ export default {
     CalendarIcon,
     Button,
     GasPrices,
+    Ranking,
   },
   props: ["selected"],
   setup(props) {

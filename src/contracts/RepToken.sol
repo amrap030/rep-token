@@ -167,8 +167,13 @@ contract RepToken is ChainlinkClient {
      */
     function burn(address _predictor) private {
         uint256 amount = 1;
+        if (balanceOf[_predictor].sub(amount) < 0) {
+            amount = balanceOf[_predictor];
+            balanceOf[_predictor] = 0;
+        } else {
+            balanceOf[_predictor] = balanceOf[_predictor].sub(amount);
+        }
         totalSupply = totalSupply.sub(amount);
-        balanceOf[_predictor] = balanceOf[_predictor].sub(amount);
         emit RepTokensBurned(_predictor, balanceOf[_predictor], amount);
     }
 

@@ -12,6 +12,9 @@
     "url": "https://github.com/amrap030/rep-token/issues"
   },
   "homepage": "https://github.com/amrap030/rep-token#readme",
+  "scripts": {
+    "truffle-deploy": "truffle migrate --reset --network live && truffle run verify RepToken --network live && truffle run verify StockAPI --network live && truffle run verify PredictionsDB --network live"
+  },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@babel/register": "^7.14.5",

@@ -27,9 +27,6 @@ export default {
     getRepBalance(state) {
       return state.repBalance;
     },
-    getWeb3(state) {
-      return state.web3;
-    },
     getPredictions(state) {
       return state.predictions;
     },
@@ -40,28 +37,32 @@ export default {
       state.address = user.address;
       state.network = user.network;
       state.ethBalance = user.ethBalance;
-      state.web3 = user.web3;
       state.repBalance = user.repBalance;
       state.predictions = user.predictions;
     },
     SET_PREDICTIONS(state, predictions) {
       state.predictions = predictions;
     },
-    SET_PREDICTION_CHECKED(state, unixDate) {
+    SET_PREDICTION_CHECKED(state, unixDate, symbol, price) {
       const index = state.predictions.findIndex(
-        (prediction) => prediction.unixDate === unixDate
+        (prediction) =>
+          prediction.unixDate === unixDate &&
+          prediction.symbol === symbol &&
+          prediction.price === price
       );
       state.predictions[index].checked = true;
     },
     SET_REP_BALANCE(state, balance) {
       state.repBalance = balance;
     },
+    SET_ETH_BALANCE(state, balance) {
+      state.ethBalance = balance;
+    },
     RESET_USER(state) {
       state.address = "";
       state.network = "";
       state.ethBalance = "";
       state.repBalance = "";
-      state.web3 = "";
       state.predictions = "";
     },
     ADD_PREDICTION(state, prediction) {
@@ -80,7 +81,6 @@ export default {
         address: accounts[0],
         network: networkId,
         ethBalance: ethBalance,
-        web3,
         repBalance: "",
         prediction: "",
       });
@@ -95,9 +95,11 @@ export default {
     },
     async setRepBalance({ state, commit }) {
       const repBalance = await getBalanceOf(state.address);
-      if (repBalance >= 0) {
-        commit("SET_REP_BALANCE", repBalance);
-      }
+      commit("SET_REP_BALANCE", repBalance);
+    },
+    async setEthBalance({ state, commit }, web3) {
+      const ethBalance = await web3.eth.getBalance(state.address);
+      commit("SET_ETH_BALANCE", ethBalance);
     },
   },
 };

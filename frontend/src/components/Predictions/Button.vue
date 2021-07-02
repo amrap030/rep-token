@@ -48,11 +48,11 @@ export default {
   props: ["data"],
   setup(props) {
     const store = useStore();
-    const { init } = initWeb3();
+    const { connect } = initWeb3();
     const { addPrediction } = predictionsDBHelper();
 
     const connectWallet = () => {
-      init();
+      connect();
     };
 
     const dateToUnixTimestamp = () => {

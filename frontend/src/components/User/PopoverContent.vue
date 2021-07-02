@@ -11,7 +11,7 @@
     </div>
     <div class="ml-4">
       <p class="text-sm font-medium text-gray-400">Ranking</p>
-      <p class="text-sm text-gray-500">You are place #1000</p>
+      <p class="text-sm text-gray-500">You are at rank # {{ getRank }}</p>
     </div>
   </div>
   <div
@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="ml-4">
-      <p class="text-sm font-medium text-gray-400">REP Token Balance</p>
+      <p class="text-sm font-medium text-gray-400">Balance</p>
       <p class="text-sm text-gray-500">
         You currently hold
         {{ store.getters["user/getRepBalance"] }} REP Tokens
@@ -60,13 +60,21 @@
 <script>
 import { StarIcon, ArchiveIcon, BadgeCheckIcon } from "@heroicons/vue/outline";
 import { useStore } from "vuex";
+import { computed } from "vue";
 
 export default {
   components: { StarIcon, ArchiveIcon, BadgeCheckIcon },
   setup() {
     const store = useStore();
 
-    return { store };
+    const getRank = computed(() => {
+      const index = store.getters["ranking/getRanking"].findIndex(
+        (ranking) => ranking.address === store.getters["user/getAddress"]
+      );
+      return index + 1;
+    });
+
+    return { store, getRank };
   },
 };
 </script>

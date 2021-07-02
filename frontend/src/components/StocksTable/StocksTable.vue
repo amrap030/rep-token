@@ -36,16 +36,27 @@
           "
         />
       </button>
-      <div class="text-gray-400">Page {{ page }} of 3</div>
+      <div class="text-gray-400">
+        Page {{ page }} of
+        {{ Math.ceil(store.getters["quotes/getQuotes"].quotes.length / 10) }}
+      </div>
       <button
         class="rounded-md  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
-        :disabled="page === 3 ? true : false"
+        :disabled="
+          page ===
+          Math.ceil(store.getters['quotes/getQuotes'].quotes.length / 10)
+            ? true
+            : false
+        "
         @click.prevent="page++"
       >
         <ChevronLeftIcon
           class="w-5 h-5 transform rotate-180 cursor-pointer"
           :class="
-            page === 3 ? 'cursor-not-allowed text-gray-700' : 'text-blue-600'
+            page ===
+            Math.ceil(store.getters['quotes/getQuotes'].quotes.length / 10)
+              ? 'cursor-not-allowed text-gray-700'
+              : 'text-blue-600'
           "
         />
       </button>

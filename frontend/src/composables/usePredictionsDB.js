@@ -19,10 +19,9 @@ const convertPredictions = (predictions) => {
 };
 
 const predictionsDBHelper = () => {
-  const setPredictionsDBAbi = () => {
-    const predictionsDBdata =
-      PredictionsDB.networks[store.getters["user/getNetworkId"]];
-    const predictionsDB = new store.getters["user/getWeb3"].eth.Contract(
+  const setPredictionsDBAbi = (web3) => {
+    const predictionsDBdata = PredictionsDB.networks[4];
+    const predictionsDB = new web3.eth.Contract(
       PredictionsDB.abi,
       predictionsDBdata.address
     );
@@ -37,18 +36,29 @@ const predictionsDBHelper = () => {
     return convertPredictions(predictions);
   };
 
-  const addPrediction = async (symbol, date, unixDate, price) => {
+  const addPrediction = (symbol, date, unixDate, price) => {
     if (symbol && date && unixDate && price && new Date(date) > Date.now()) {
-      await store.getters["predictionsDB/getAbi"].methods
+      store.getters["predictionsDB/getAbi"].methods
         .addPrediction(symbol, date, unixDate, price)
         .send({ from: store.getters["user/getAddress"] })
         .on("transactionHash", (hash) => {
-          console.log(hash);
+          store.commit("transactions/ADD_TRANSACTION", hash);
         })
         .on("receipt", (receipt) => {
           if (receipt) {
-            console.log("Prediction added");
+            store.commit(
+              "transactions/REMOVE_TRANSACTION",
+              receipt.transactionHash
+            );
+            store.dispatch("user/setEthBalance", store.getters["web3/getWeb3"]);
           }
+          store.commit("notifications/ADD_NOTIFICATION", {
+            status: "Success",
+            message: "Successfully added prediction!",
+          });
+          setTimeout(() => {
+            store.commit("notifications/REMOVE_NOTIFICATION");
+          }, 1000 * 5);
         })
         .on("error", (err) => {
           console.log(err);

@@ -7,14 +7,14 @@ const getPastEvents = async (event, value) => {
     toBlock: "latest",
   });
   const addresses = events
-    .map((item) => item.address)
+    .map((item) => item.returnValues["to"] || item.returnValues["from"])
     .filter((value, index, self) => self.indexOf(value) === index);
   return addresses.map((address) => ({
     address,
     balance: Number(
       events.reduce(
         (accumulator, currentValue) =>
-          accumulator + currentValue.returnValues[value],
+          accumulator + Number(currentValue.returnValues[value]),
         0
       )
     ),
@@ -22,12 +22,9 @@ const getPastEvents = async (event, value) => {
 };
 
 const repTokenHelper = () => {
-  const setRepTokenAbi = () => {
-    const repTokendata = RepToken.networks[store.getters["user/getNetworkId"]];
-    const repToken = new store.getters["user/getWeb3"].eth.Contract(
-      RepToken.abi,
-      repTokendata.address
-    );
+  const setRepTokenAbi = (web3) => {
+    const repTokendata = RepToken.networks[4];
+    const repToken = new web3.eth.Contract(RepToken.abi, repTokendata.address);
     store.commit("repToken/SET_ABI", repToken);
   };
 
@@ -39,8 +36,20 @@ const repTokenHelper = () => {
   };
 
   const getMintBurnHistory = async () => {
-    await getPastEvents("RepTokensMinted", "amount");
-    //const burned = await getPastEvents("RepTokensBurned", "balanceOf");
+    const minted = await getPastEvents("RepTokensMinted", "amount");
+    const burned = await getPastEvents("RepTokensBurned", "balanceOf");
+    let ranking = [];
+    minted.forEach((mintedItem) => {
+      const amountBurned = burned.find(
+        (burnedItem) => burnedItem.address === mintedItem.address
+      ).balance;
+      ranking.push({
+        address: mintedItem.address,
+        balance: mintedItem.balance - amountBurned,
+      });
+    });
+    store.commit("ranking/SET_RANKING", ranking);
+    store.commit("ranking/SET_IS_LOADING", false);
   };
 
   const listenRepTokensMinted = () => {
@@ -49,6 +58,28 @@ const repTokenHelper = () => {
       .on("data", (event) => {
         if (event.returnValues.to === store.getters["user/getAddress"]) {
           store.commit("user/SET_REP_BALANCE", event.returnValues.balanceOf);
+          store.commit("notifications/ADD_NOTIFICATION", {
+            status: "Success",
+            message: `You earned ${
+              event.returnValues.balanceOf - store.getters["user/getRepBalance"]
+            } REP Tokens!`,
+          });
+          setTimeout(() => {
+            store.commit("notifications/REMOVE_NOTIFICATION");
+          }, 1000 * 5);
+          store.commit("transactions/SET_IS_EVALUATING", false);
+        }
+        const index = store.getters["ranking/getRanking"].findIndex(
+          (rank) => rank.address === event.returnValues.from
+        );
+        if (index >= -1) {
+          store.getters["ranking/getRanking"][index].balance =
+            event.returnValues.balanceOf;
+        } else {
+          store.commit("ranking/ADD_USER", {
+            address: event.returnValues.from,
+            balance: event.returnValues.balanceOf,
+          });
         }
       })
       .on("error", console.error);
@@ -60,6 +91,28 @@ const repTokenHelper = () => {
       .on("data", (event) => {
         if (event.returnValues.from === store.getters["user/getAddress"]) {
           store.commit("user/SET_REP_BALANCE", event.returnValues.balanceOf);
+          store.commit("notifications/ADD_NOTIFICATION", {
+            status: "Failure",
+            message: `You burned ${
+              store.getters["user/getRepBalance"] - event.returnValues.balanceOf
+            } REP Tokens!`,
+          });
+          setTimeout(() => {
+            store.commit("notifications/REMOVE_NOTIFICATION");
+          }, 1000 * 5);
+          store.commit("transactions/SET_IS_EVALUATING", false);
+        }
+        const index = store.getters["ranking/getRanking"].findIndex(
+          (rank) => rank.address === event.returnValues.from
+        );
+        if (index >= -1) {
+          store.getters["ranking/getRanking"][index].balance =
+            event.returnValues.balanceOf;
+        } else {
+          store.commit("ranking/ADD_USER", {
+            address: event.returnValues.from,
+            balance: event.returnValues.balanceOf,
+          });
         }
       })
       .on("error", console.error);
@@ -69,10 +122,13 @@ const repTokenHelper = () => {
     store.getters["repToken/getAbi"].events
       .PredictionEvaluated()
       .on("data", (event) => {
+        console.log(event);
         if (event.returnValues.predictor === store.getters["user/getAddress"]) {
           store.commit(
             "user/SET_PREDICTION_CHECKED",
-            event.returnValues.unixDate
+            event.returnValues.unixDate,
+            event.returnValues.symbol,
+            event.returnValues.price
           );
         }
       })
@@ -84,11 +140,16 @@ const repTokenHelper = () => {
       .evaluatePredictions()
       .send({ from: store.getters["user/getAddress"] })
       .on("transactionHash", (hash) => {
-        console.log(hash);
+        store.commit("transactions/ADD_TRANSACTION", hash);
+        store.commit("transactions/SET_IS_EVALUATING", true);
       })
       .on("receipt", (receipt) => {
         if (receipt) {
-          console.log("Predictions evaluated");
+          store.commit(
+            "transactions/REMOVE_TRANSACTION",
+            receipt.transactionHash
+          );
+          store.dispatch("user/setEthBalance", store.getters["web3/getWeb3"]);
         }
       })
       .on("error", (err) => {
