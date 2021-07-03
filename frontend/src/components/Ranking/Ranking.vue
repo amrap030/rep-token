@@ -51,21 +51,25 @@
       </button>
       <div class="text-gray-400">
         Page {{ page }} of
-        {{ Math.ceil(store.getters["ranking/getRanking"].length / 10) }}
+        {{
+          store.getters["ranking/getRanking"].length === 0
+            ? 1
+            : Math.ceil(store.getters["ranking/getRanking"].length / 10)
+        }}
       </div>
       <button
         class="rounded-md  focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-900"
         :disabled="
+          store.getters['ranking/getRanking'].length === 0 ||
           page === Math.ceil(store.getters['ranking/getRanking'].length / 10)
-            ? true
-            : false
         "
         @click.prevent="page++"
       >
         <ChevronLeftIcon
           class="w-5 h-5 transform rotate-180 cursor-pointer"
           :class="
-            page === Math.ceil(store.getters['ranking/getRanking'].length / 10)
+            page ===
+              Math.ceil(store.getters['ranking/getRanking'].length / 10) || 1
               ? 'cursor-not-allowed text-gray-700'
               : 'text-blue-600'
           "
